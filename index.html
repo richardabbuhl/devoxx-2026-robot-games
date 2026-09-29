@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#151b1e">
+  <title>After Hours: Cinema Circuit</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <span class="brand-mark">DX</span>
+        <div>
+          <p class="eyebrow">Devoxx Belgium 2026</p>
+          <h1>After Hours <span>/ Cinema Circuit</span></h1>
+        </div>
+      </div>
+      <div class="mission-status">
+        <span class="status-dot"></span>
+        <span id="status-copy">Systems asleep</span>
+        <button class="icon-button" id="reset-button" type="button" title="Restart mission" aria-label="Restart mission">↻</button>
+      </div>
+    </header>
+
+    <section class="briefing-bar">
+      <div>
+        <p class="eyebrow">Kinepolis Antwerp · 02:17</p>
+        <h2>Wake the cinema before the morning crowd.</h2>
+      </div>
+      <div class="briefing-meta">
+        <span class="timer-label">TIME TO OPEN</span>
+        <strong id="timer">01:30</strong>
+      </div>
+    </section>
+
+    <div class="game-layout">
+      <section class="playfield-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Live floor plan</p>
+            <h3>One building. Three specialists.</h3>
+          </div>
+          <div class="coordinate-readout" id="coordinate-readout">FOYER / NORTH</div>
+        </div>
+        <div class="floor-plan" id="floor-plan" tabindex="0" aria-label="Interactive Kinepolis floor plan. Use arrow keys or WASD to move.">
+          <div class="map-watermark">KINEPOLIS<br><span>ANTWERP</span></div>
+          <div class="venue-zone zone-exhibition"><span>EXHIBITION FLOOR</span><small>ground level</small></div>
+          <div class="venue-zone zone-foyer"><span>FOYER</span><small>concourse</small></div>
+          <div class="venue-zone zone-stairs"><span>GRAND STAIR</span><small>⇅</small></div>
+          <div class="venue-zone zone-aud-1"><span>AUD 01</span><small>KEYNOTE</small></div>
+          <div class="venue-zone zone-aud-2"><span>AUD 02</span><small>BOF</small></div>
+          <div class="venue-zone zone-aud-3"><span>AUD 03</span><small>DEEP DIVE</small></div>
+          <div class="venue-zone zone-aud-4"><span>AUD 04</span><small>WORKSHOP</small></div>
+          <div class="venue-zone zone-aud-5"><span>AUD 05</span><small>THEATRE</small></div>
+          <div class="venue-zone zone-aud-6"><span>AUD 06</span><small>SCREENING</small></div>
+          <div class="corridor corridor-main"></div>
+          <div class="corridor corridor-cross"></div>
+          <div class="map-label label-north">CINEMA LEVEL</div>
+          <div class="map-label label-south">EXHIBITION LEVEL</div>
+          <div class="objective objective-power" data-target="droid"><span>⌁</span><b>PROJECTION</b><small>DROID</small></div>
+          <div class="objective objective-beacon" data-target="voxxy"><span>✦</span><b>BEACON</b><small>VOXXY</small></div>
+          <div class="objective objective-gate" data-target="biggy"><span>⬡</span><b>STAIR GATE</b><small>BIGGY</small></div>
+          <div class="robot-token token-voxxy" id="token-voxxy" data-robot="voxxy"><span>V</span></div>
+          <div class="robot-token token-droid" id="token-droid" data-robot="droid"><span>D</span></div>
+          <div class="robot-token token-biggy" id="token-biggy" data-robot="biggy"><span>B</span></div>
+          <div class="pulse-ring" id="pulse-ring"></div>
+          <div class="toast" id="toast" role="status"></div>
+        </div>
+        <div class="map-footer">
+          <span><i class="legend-dot legend-voxxy"></i> fast / scan</span>
+          <span><i class="legend-dot legend-droid"></i> precise / repair</span>
+          <span><i class="legend-dot legend-biggy"></i> heavy / charge</span>
+          <span class="keyboard-hint"><kbd>WASD</kbd> move <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> switch <kbd>E</kbd> activate</span>
+        </div>
+      </section>
+
+      <aside class="control-panel">
+        <div class="panel-heading compact-heading">
+          <div>
+            <p class="eyebrow">Control room</p>
+            <h3>Crew manifest</h3>
+          </div>
+          <span class="live-pill">LIVE</span>
+        </div>
+        <div class="crew-list" id="crew-list">
+          <button class="crew-card active" data-select="voxxy" type="button">
+            <span class="portrait portrait-voxxy"><img src="github/assets/robots/voxxy-robot.png" alt="Voxxy reference"></span>
+            <span class="crew-copy"><b>01 · VOXXY</b><small>Quick scout · scan signal</small></span>
+            <span class="crew-state" id="state-voxxy">READY</span>
+          </button>
+          <button class="crew-card" data-select="droid" type="button">
+            <span class="portrait portrait-droid"><img src="github/assets/robots/droid-robot.png" alt="Droid reference"></span>
+            <span class="crew-copy"><b>02 · DROID</b><small>Old hand · repair projector</small></span>
+            <span class="crew-state" id="state-droid">READY</span>
+          </button>
+          <button class="crew-card" data-select="biggy" type="button">
+            <span class="portrait portrait-biggy"><img src="github/assets/robots/biggy-robot.png" alt="Biggy reference"></span>
+            <span class="crew-copy"><b>03 · BIGGY</b><small>Heavy unit · charge stair gate</small></span>
+            <span class="crew-state" id="state-biggy">READY</span>
+          </button>
+        </div>
+
+        <div class="mission-log">
+          <div class="log-heading"><span>Mission log</span><span id="objective-count">0 / 3</span></div>
+          <div class="log-line"><span class="log-bullet"></span><p id="mission-message">Select a crew member, then move them to their marked console.</p></div>
+        </div>
+
+        <div class="brief-card">
+          <span class="brief-icon">◎</span>
+          <div><b>THE NIGHT SHIFT</b><p>Every robot has one job only they can do. Bring all three online before the doors unlock.</p></div>
+        </div>
+        <p class="venue-note">KINEPOLIS ANTWERP <span>·</span> CINEMA LEVEL / EXHIBITION HALL</p>
+      </aside>
+    </div>
+  </main>
+
+  <div class="modal-backdrop" id="start-modal">
+    <section class="start-card" aria-labelledby="start-title">
+      <div class="start-signal">NIGHT SHIFT // 02:17</div>
+      <p class="eyebrow">A Devoxx Robot Games prototype</p>
+      <h2 id="start-title">The cinema is dark.<br><em>Make it hum.</em></h2>
+      <p>Three systems are down across Kinepolis. Route each specialist to their console and wake the building before the first guests arrive.</p>
+      <div class="start-grid">
+        <span><b>01</b> Scan the beacon with Voxxy</span>
+        <span><b>02</b> Repair the projector with Droid</span>
+        <span><b>03</b> Charge the stair gate with Biggy</span>
+      </div>
+      <button class="primary-button" id="start-button" type="button">Start the night shift <span>→</span></button>
+      <small>Keyboard: WASD / arrows to move · 1 2 3 to switch · E to activate</small>
+    </section>
+  </div>
+
+  <div class="modal-backdrop hidden" id="end-modal">
+    <section class="start-card end-card" aria-labelledby="end-title">
+      <div class="start-signal" id="end-signal">CIRCUIT COMPLETE</div>
+      <p class="eyebrow">Kinepolis Antwerp · doors unlocked</p>
+      <h2 id="end-title">The building<br><em>is awake.</em></h2>
+      <p id="end-copy">All three specialists did exactly what they came to do.</p>
+      <div class="score-line"><span>SHIFT SCORE</span><strong id="score">100</strong></div>
+      <button class="primary-button" id="again-button" type="button">Run another shift <span>↻</span></button>
+    </section>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
