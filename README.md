@@ -1,17 +1,44 @@
-# devoxx-2026-robot-games
-A playable game, set in the Kinepolis Antwerp, in which all three robots appear and matter.
+# After Hours: Cinema Circuit
+
+A Three.js exploration game set across the exhibition hall and cinema level at Kinepolis Antwerp. Wake three venue systems during the timed mission, then continue exploring the two connected floors.
 
 ## Play
 
-Open [`index.html`](index.html) in a browser. No install or build step is
-required.
+Requirements: Node.js 20.19+ or 22.12+.
 
-**After Hours: Cinema Circuit** is a short keyboard game about waking the
-Kinepolis before the morning crowd arrives. Switch between Voxxy, Droid, and
-Biggy, move each specialist to their marked console, and press `E` to use their
-unique ability. Use `WASD` or the arrow keys to move and `1`, `2`, or `3` to
-switch robots.
+```sh
+npm install
+npm run dev
+```
 
-The game uses the supplied Kinepolis floor plan and robot reference images from
-`github/assets/`. See [GAME-INSTRUCTIONS.md](GAME-INSTRUCTIONS.md) for the
-competition brief and constraints.
+Open the local URL printed by Vite. `npm run build` creates the production bundle; `npm run preview` serves it locally. Run `npm test` for the layout, collision, movement, scene, and mission suites.
+
+## Controls
+
+- Move: `WASD` or arrow keys; the on-screen directional pad is available on narrow touch layouts.
+- Switch specialists: `1`, `2`, `3`, or select a crew member.
+- Activate a nearby assigned objective: `E` or `Enter`.
+- Restart a shift: the restart button in the status bar.
+
+Voxxy scans the exhibition beacon, Droid repairs the projector by Auditorium 03, and Biggy charges the grand stair gate. Finish all three before time expires to unlock untimed exploration. A timed-out shift can be restarted.
+
+## Environment Assumptions
+
+The exhibition hall is on the ground floor at Y = 0 m; the auditorium/concourse floor is 4.5 m above it. The world scale is 1 scene unit per metre. Dimensions are approximate modeling estimates traced from the supplied drawings, not a venue survey.
+
+- Typical clear room height: 3.6 m; the exhibition hall is modeled as a taller open volume.
+- Grand staircase: 4 m wide, 8.5 m horizontal run, 4.5 m rise; visible steps sit above a continuous ramp used for robot traversal.
+- Public double-door openings: approximately 1.8 m wide and 2.2 m high; wider hall connections follow the plan proportions.
+- Main circulation routes are modeled at least 2 m clear where the plans do not specify dimensions.
+- Auditorium seating uses 0.65 m side aisles and 1.1 m center and cross-aisles; seat banks are split around those routes.
+- Robot collision body: approximately 0.55 m wide and 0.8 m tall.
+- Public circulation uses polished stone/terrazzo; auditoriums use dark carpet and acoustic wall finishes; general walls are pale plaster/concrete; stair treads use stone/concrete with metal rails.
+- The stair/foyer connection is the vertical alignment anchor. Room proportions and relative locations follow the plan images; exact building scale and finishes remain estimates.
+
+## References and Tools
+
+Venue layout references: `github/assets/maps/exhibition-floor.jpg`, `hollywood-area.png`, `cinema-venue-devoxx.png`, and `devoxx-rooms.jpg`. Robot crew references are the local files in `github/assets/robots/`. Plan images are references only, not playable floor textures. Venue photos are not used as runtime assets; retain the licensing notes in [`github/ASSET-SOURCES.md`](github/ASSET-SOURCES.md).
+
+The browser game uses JavaScript ES modules, Three.js, and Vite. GitHub Copilot assisted with the procedural geometry, collision model, and tests. Iterations added explicit wall gaps at doors, split auditorium seating around aisles, floor-specific walkable regions, and a ramp-aligned stair after testing exposed route and collision edge cases. The plan-derived geometry and all dimensions were reviewed and adjusted by hand; measurements should not be treated as surveyed.
+
+See [`GAME-INSTRUCTIONS.md`](GAME-INSTRUCTIONS.md) for the competition brief and constraints.

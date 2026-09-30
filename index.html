@@ -19,7 +19,7 @@
       </div>
       <div class="mission-status">
         <span class="status-dot"></span>
-        <span id="status-copy">Systems asleep</span>
+        <span id="status-copy" aria-live="polite">Systems asleep</span>
         <button class="icon-button" id="reset-button" type="button" title="Restart mission" aria-label="Restart mission">↻</button>
       </div>
     </header>
@@ -39,34 +39,18 @@
       <section class="playfield-panel">
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">Live floor plan</p>
-            <h3>One building. Three specialists.</h3>
+            <p class="eyebrow">Kinepolis Antwerp · 3D environment</p>
+            <h3>Two levels. Three specialists.</h3>
           </div>
-          <div class="coordinate-readout" id="coordinate-readout">FOYER / NORTH</div>
+          <div class="coordinate-readout" id="coordinate-readout" aria-live="polite">EXHIBITION HALL / GROUND FLOOR</div>
         </div>
-        <div class="floor-plan" id="floor-plan" tabindex="0" aria-label="Interactive Kinepolis floor plan. Use arrow keys or WASD to move.">
-          <div class="map-watermark">KINEPOLIS<br><span>ANTWERP</span></div>
-          <div class="venue-zone zone-exhibition"><span>EXHIBITION FLOOR</span><small>ground level</small></div>
-          <div class="venue-zone zone-foyer"><span>FOYER</span><small>concourse</small></div>
-          <div class="venue-zone zone-stairs"><span>GRAND STAIR</span><small>⇅</small></div>
-          <div class="venue-zone zone-aud-1"><span>AUD 01</span><small>KEYNOTE</small></div>
-          <div class="venue-zone zone-aud-2"><span>AUD 02</span><small>BOF</small></div>
-          <div class="venue-zone zone-aud-3"><span>AUD 03</span><small>DEEP DIVE</small></div>
-          <div class="venue-zone zone-aud-4"><span>AUD 04</span><small>WORKSHOP</small></div>
-          <div class="venue-zone zone-aud-5"><span>AUD 05</span><small>THEATRE</small></div>
-          <div class="venue-zone zone-aud-6"><span>AUD 06</span><small>SCREENING</small></div>
-          <div class="corridor corridor-main"></div>
-          <div class="corridor corridor-cross"></div>
-          <div class="map-label label-north">CINEMA LEVEL</div>
-          <div class="map-label label-south">EXHIBITION LEVEL</div>
-          <div class="objective objective-power" data-target="droid"><span>⌁</span><b>PROJECTION</b><small>DROID</small></div>
-          <div class="objective objective-beacon" data-target="voxxy"><span>✦</span><b>BEACON</b><small>VOXXY</small></div>
-          <div class="objective objective-gate" data-target="biggy"><span>⬡</span><b>STAIR GATE</b><small>BIGGY</small></div>
-          <div class="robot-token token-voxxy" id="token-voxxy" data-robot="voxxy"><span>V</span></div>
-          <div class="robot-token token-droid" id="token-droid" data-robot="droid"><span>D</span></div>
-          <div class="robot-token token-biggy" id="token-biggy" data-robot="biggy"><span>B</span></div>
-          <div class="pulse-ring" id="pulse-ring"></div>
-          <div class="toast" id="toast" role="status"></div>
+        <div id="game-view" tabindex="0" aria-label="Interactive 3D Kinepolis environment">
+          <div class="touch-pad" id="touch-pad" role="group" aria-label="Robot movement controls">
+            <button type="button" data-move="up" aria-label="Move forward" title="Move forward">↑</button>
+            <button type="button" data-move="left" aria-label="Move left" title="Move left">←</button>
+            <button type="button" data-move="down" aria-label="Move backward" title="Move backward">↓</button>
+            <button type="button" data-move="right" aria-label="Move right" title="Move right">→</button>
+          </div>
         </div>
         <div class="map-footer">
           <span><i class="legend-dot legend-voxxy"></i> fast / scan</span>
@@ -104,7 +88,7 @@
 
         <div class="mission-log">
           <div class="log-heading"><span>Mission log</span><span id="objective-count">0 / 3</span></div>
-          <div class="log-line"><span class="log-bullet"></span><p id="mission-message">Select a crew member, then move them to their marked console.</p></div>
+          <div class="log-line"><span class="log-bullet"></span><p id="mission-message" aria-live="polite">Select a crew member, then move them to their marked console.</p></div>
         </div>
 
         <div class="brief-card">
@@ -128,7 +112,7 @@
         <span><b>03</b> Charge the stair gate with Biggy</span>
       </div>
       <button class="primary-button" id="start-button" type="button">Start the night shift <span>→</span></button>
-      <small>Keyboard: WASD / arrows to move · 1 2 3 to switch · E to activate</small>
+      <small>Move: WASD / arrows · Switch: 1 2 3 · Activate: E</small>
     </section>
   </div>
 
@@ -139,9 +123,10 @@
       <h2 id="end-title">The building<br><em>is awake.</em></h2>
       <p id="end-copy">All three specialists did exactly what they came to do.</p>
       <div class="score-line"><span>SHIFT SCORE</span><strong id="score">100</strong></div>
+      <button class="primary-button" id="explore-button" type="button" hidden>Continue exploring <span>→</span></button>
       <button class="primary-button" id="again-button" type="button">Run another shift <span>↻</span></button>
     </section>
   </div>
-  <script src="game.js"></script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>

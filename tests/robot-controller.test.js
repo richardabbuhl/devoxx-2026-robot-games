@@ -1,0 +1,61 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { advanceRobotState, createRobotController, ROBOT_SPECS } from '../src/robot-controller.js';
+import { venueLayout } from '../src/venue-layout.js';
+
+test('robot specialists retain distinct speeds', () => {
+  assert.ok(ROBOT_SPECS.voxxy.speed > ROBOT_SPECS.droid.speed);
+  assert.ok(ROBOT_SPECS.droid.speed > ROBOT_SPECS.biggy.speed);
+});
+
+test('diagonal movement is normalized to robot speed', () => {
+  const state = { x: 8, y: 0, z: 25, vx: 0, vz: 0, speed: 3 };
+  const next = advanceRobotState(state, { x: 1, z: 1 }, 1, venueLayout, []);
+  assert.ok(Math.hypot(next.vx, next.vz) <= state.speed + 1e-9);
+});
+
+test('movement accelerates and releases with smooth deceleration', () => {
+  const state = { x: 8, y: 0, z: 25, vx: 0, vz: 0, speed: 3 };
+  const moving = advanceRobotState(state, { x: 0, z: 1 }, 0.08, venueLayout, []);
+  assert.ok(moving.vz > 0 && moving.vz < state.speed);
+  const coasting = advanceRobotState(moving, { x: 0, z: 0 }, 0.08, venueLayout, []);
+  assert.ok(coasting.vz >= 0 && coasting.vz < moving.vz);
+});
+
+test('wall collision is applied to movement state', () => {
+  const wall = { minX: 1, maxX: 1.2, minZ: 24, maxZ: 26, minY: 0, maxY: 3.6 };
+  const state = { x: 0, y: 0, z: 25, vx: 0, vz: 0, speed: 3 };
+  const next = advanceRobotState(state, { x: 1, z: 0 }, 1, venueLayout, [wall]);
+  assert.ok(next.x <= 0.725);
+});
+
+test('robots climb and descend the grand stair without changing X/Z by teleportation', () => {
+  const stair = venueLayout.stairs[0];
+  const ascending = advanceRobotState({ x: stair.lower.x, y: stair.lower.y, z: stair.lower.z, vx: 0, vz: 0, speed: 3 }, { x: 0, z: 1 }, 1, venueLayout, []);
+  assert.ok(ascending.z > stair.lower.z);
+  assert.ok(ascending.y > stair.lower.y && ascending.y < stair.upper.y);
+  const descending = advanceRobotState({ x: stair.upper.x, y: stair.upper.y, z: stair.upper.z, vx: 0, vz: 0, speed: 3 }, { x: 0, z: -1 }, 1, venueLayout, []);
+  assert.ok(descending.z < stair.upper.z);
+  assert.ok(descending.y < stair.upper.y && descending.y > stair.lower.y);
+});
+
+test('keyboard input moves the selected robot and selection switches specialists', () => {
+  const spawnPoints = Object.fromEntries(Object.values(ROBOT_SPECS).map(({ id }) => [
+    id,
+    { ...venueLayout.objectives.find(({ robotId }) => robotId === id).position }
+  ]));
+  const controller = createRobotController({
+    THREE: null,
+    camera: null,
+    canvas: null,
+    layout: venueLayout,
+    colliders: [],
+    spawnPoints
+  });
+  const startZ = controller.robots.voxxy.z;
+  controller.setInput('W', true);
+  controller.update(0.08);
+  assert.ok(controller.robots.voxxy.z < startZ);
+  assert.equal(controller.selectRobot('droid'), true);
+  assert.equal(controller.activeRobotId, 'droid');
+});
