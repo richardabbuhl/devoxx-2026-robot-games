@@ -42,3 +42,4 @@ Venue layout references: `github/assets/maps/exhibition-floor.jpg`, `hollywood-a
 The browser game uses JavaScript ES modules, Three.js, and Vite. GitHub Copilot assisted with the procedural geometry, collision model, and tests. Iterations added explicit wall gaps at doors, split auditorium seating around aisles, floor-specific walkable regions, and a ramp-aligned stair after testing exposed route and collision edge cases. The plan-derived geometry and all dimensions were reviewed and adjusted by hand; measurements should not be treated as surveyed.
 
 See [`GAME-INSTRUCTIONS.md`](GAME-INSTRUCTIONS.md) for the competition brief and constraints.
+See [`docs/superpowers/specs/Prompts.md`](docs/superpowers/specs/Prompts.md) for the original environment prompt, gameplay direction, and modeling iterations.
