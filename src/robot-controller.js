@@ -92,7 +92,8 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
     }
     if (camera && THREE) {
       const target = new THREE.Vector3(robot.x, robot.y + 0.55, robot.z);
-      const desiredPosition = new THREE.Vector3(robot.x + 5.6, robot.y + 6, robot.z + 8.5);
+      const cameraHeight = robot.y < 4.5 ? 3.2 : 6;
+      const desiredPosition = new THREE.Vector3(robot.x + 5.6, robot.y + cameraHeight, robot.z + 8.5);
       camera.position.lerp(desiredPosition, 1 - Math.exp(-4 * Math.min(deltaSeconds, 0.1)));
       camera.lookAt(target);
     }
