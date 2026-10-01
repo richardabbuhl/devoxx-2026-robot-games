@@ -168,6 +168,7 @@ document.querySelectorAll('[data-select]').forEach((card) => {
   card.addEventListener('click', () => {
     robotController.selectRobot(card.dataset.select);
     mission.selectRobot(card.dataset.select);
+    renderer.domElement.focus({ preventScroll: true });
   });
 });
 ui.startButton.addEventListener('click', startGame);
