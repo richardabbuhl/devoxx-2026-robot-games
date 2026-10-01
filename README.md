@@ -4,7 +4,7 @@ A Three.js exploration game set across the exhibition hall and cinema level at K
 
 ## Play
 
-Requirements: Node.js 20.19+ or 22.12+.
+The quickest setup uses Node.js 20.19+ or 22.12+:
 
 ```sh
 npm install
@@ -12,6 +12,16 @@ npm run dev
 ```
 
 Open the local URL printed by Vite. `npm run build` creates the production bundle; `npm run preview` serves it locally. Run `npm test` for the layout, collision, movement, scene, and mission suites.
+
+### Run without `npm install`
+
+The game can also run directly as browser-native ES modules. The HTML file maps Three.js to the pinned jsDelivr URL, so no npm packages are needed for runtime. From the repository root, start any static file server, for example:
+
+```sh
+python3 -m http.server 8000
+```
+
+Then open <http://localhost:8000>. This requires the browser or work network to allow `cdn.jsdelivr.net`. For an offline or locked-down environment, download `three.module.js` from the same URL into `vendor/three.module.js`, change the import-map value to `./vendor/three.module.js`, and serve the repository with the same command. Opening `index.html` with `file://` is not supported reliably because browsers restrict module and asset loading from local files.
 
 ## Controls
 
