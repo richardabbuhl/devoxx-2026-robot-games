@@ -17,6 +17,9 @@ test('venue scene is assembled from both levels and shared layout colliders', ()
   assert.ok(result.scene.getObjectByName('grand-stair-treads'));
   assert.ok(result.scene.getObjectByName('aud-03-carpet'));
   assert.ok(result.scene.getObjectByName('power-navigation-beam'));
+  assert.ok(result.scene.getObjectByName('voxxy-face-screen'));
+  assert.ok(result.scene.getObjectByName('droid-repair-visor'));
+  assert.ok(result.scene.getObjectByName('biggy-blue-helmet'));
   assert.equal(result.systemEffects.size, venueLayout.objectives.length);
   result.setCompletedObjectives(['beacon', 'power']);
   assert.equal(result.systemEffects.get('beacon').visible, true);

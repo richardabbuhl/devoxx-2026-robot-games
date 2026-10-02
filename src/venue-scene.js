@@ -12,7 +12,13 @@ const COLORS = Object.freeze({
   amber: 0xe1a65a,
   cyan: 0x6bd0c3,
   blue: 0x80a8d8,
-  orange: 0xe9784f
+  orange: 0xe9784f,
+  voxxyOrange: 0xf07822,
+  droidMetal: 0x2b3035,
+  biggyBlue: 0x35434d,
+  biggyRust: 0xaf4e2e,
+  face: 0x111518,
+  ivory: 0xd7d3c8
 });
 
 const ROBOT_COLORS = Object.freeze({ voxxy: COLORS.cyan, droid: COLORS.blue, biggy: COLORS.orange });
@@ -41,7 +47,6 @@ function makeBox(THREE, parent, name, bounds, meshMaterial, options = {}) {
   mesh.position.set((bounds.minX + bounds.maxX) / 2, (bounds.minY + bounds.maxY) / 2, (bounds.minZ + bounds.maxZ) / 2);
   mesh.castShadow = options.castShadow ?? true;
   mesh.receiveShadow = options.receiveShadow ?? true;
-  parent.add(mesh);
   return mesh;
 }
 
@@ -57,10 +62,15 @@ function makePlane(THREE, parent, name, bounds, elevation, planeMaterial) {
   return mesh;
 }
 
-function addDoorFrame(THREE, scene, door, frameMaterial) {
+/*
+  const metalMaterial = material(THREE, COLORS.rail, { metalness: 0.72, roughness: 0.26 });
+  const darkMaterial = material(THREE, COLORS.face, { metalness: 0.2, roughness: 0.42 });
+  const ivoryMaterial = material(THREE, COLORS.ivory, { metalness: 0.48, roughness: 0.32 });
+  const addPart = (name, geometry, meshMaterial, position, rotation = [0, 0, 0]) => {
   const rotation = door.side === 'east' || door.side === 'west' ? Math.PI / 2 : 0;
   const width = door.width;
   const center = door.position;
+    part.rotation.set(...rotation);
   const y = center.y;
   const zDepth = 0.32;
   const group = new THREE.Group();
@@ -68,15 +78,93 @@ function addDoorFrame(THREE, scene, door, frameMaterial) {
   group.position.set(center.x, y, center.z);
   group.rotation.y = rotation;
   const jambHeight = 2.2;
+    const orange = material(THREE, COLORS.voxxyOrange, { metalness: 0.32, roughness: 0.22 });
+    const eyeMaterial = new THREE.MeshStandardMaterial({ color: COLORS.amber, emissive: COLORS.amber, emissiveIntensity: 2.8, roughness: 0.2 });
+    const head = addPart('head', new THREE.SphereGeometry(0.32, 20, 14), orange, [0, 0.2, 0]);
+    head.scale.set(1.12, 0.88, 1);
+    const face = addPart('face-screen', new THREE.SphereGeometry(0.245, 20, 12), darkMaterial, [0, 0.19, -0.2]);
+    face.scale.set(1.12, 0.7, 0.24);
+    for (const side of [-1, 1]) {
+      addPart(`ear-${side}`, new THREE.SphereGeometry(0.1, 12, 10), orange, [side * 0.22, 0.42, 0]);
+      addPart(`arm-${side}`, new THREE.CapsuleGeometry(0.065, 0.2, 4, 8), orange, [side * 0.28, -0.16, -0.01], [0, 0, side * 0.35]);
+    }
+    addPart('torso', new THREE.ConeGeometry(0.19, 0.38, 16), orange, [0, -0.2, 0]);
+    addPart('left-eye', new THREE.SphereGeometry(0.035, 10, 8), eyeMaterial, [-0.085, 0.2, -0.255]);
+    addPart('right-eye', new THREE.SphereGeometry(0.035, 10, 8), eyeMaterial, [0.085, 0.2, -0.255]);
+    jamb.position.set(side * (width / 2 - jambWidth / 2), jambHeight / 2, 0);
+    const droidPaint = material(THREE, COLORS.droidMetal, { metalness: 0.52, roughness: 0.54 });
+    const eyeMaterial = new THREE.MeshStandardMaterial({ color: COLORS.amber, emissive: COLORS.amber, emissiveIntensity: 2.1, roughness: 0.2 });
+    const torso = addPart('repair-torso', new THREE.BoxGeometry(0.42, 0.38, 0.25), droidPaint, [0, -0.03, 0]);
+    torso.rotation.x = -0.12;
+    const head = addPart('repair-head', new THREE.SphereGeometry(0.19, 16, 12), droidPaint, [0, 0.34, -0.015]);
+    head.scale.set(0.92, 1.05, 0.88);
+    addPart('repair-visor', new THREE.BoxGeometry(0.22, 0.08, 0.025), darkMaterial, [0, 0.34, -0.17]);
+    addPart('left-eye', new THREE.SphereGeometry(0.025, 10, 8), eyeMaterial, [-0.06, 0.35, -0.19]);
+    addPart('right-eye', new THREE.SphereGeometry(0.025, 10, 8), eyeMaterial, [0.06, 0.35, -0.19]);
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(width, jambWidth, zDepth), frameMaterial);
+      addPart(`shoulder-${side}`, new THREE.SphereGeometry(0.09, 12, 10), metalMaterial, [side * 0.26, 0.08, 0]);
+      addPart(`repair-arm-${side}`, new THREE.CapsuleGeometry(0.04, 0.26, 4, 8), droidPaint, [side * 0.29, -0.16, 0], [0, 0, side * 0.12]);
+      addPart(`repair-leg-${side}`, new THREE.CapsuleGeometry(0.05, 0.2, 4, 8), droidPaint, [side * 0.12, -0.39, 0]);
+      addPart(`foot-${side}`, new THREE.BoxGeometry(0.11, 0.06, 0.16), metalMaterial, [side * 0.12, -0.54, -0.025]);
+  scene.add(group);
+}
+    const bluePaint = material(THREE, COLORS.biggyBlue, { metalness: 0.45, roughness: 0.5 });
+    const rustPaint = material(THREE, COLORS.biggyRust, { metalness: 0.36, roughness: 0.58 });
+    const eyeMaterial = new THREE.MeshStandardMaterial({ color: COLORS.ivory, emissive: COLORS.ivory, emissiveIntensity: 1.6, roughness: 0.22 });
+    const belly = addPart('armored-belly', new THREE.SphereGeometry(0.34, 18, 14), rustPaint, [0, -0.02, -0.015]);
+    belly.scale.set(1.08, 1.02, 0.95);
+    const helmet = addPart('blue-helmet', new THREE.SphereGeometry(0.34, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2), bluePaint, [0, 0.23, 0]);
+    helmet.scale.set(1.05, 0.82, 1);
+    for (const side of [-1, 1]) {
+      addPart(`eye-${side}`, new THREE.SphereGeometry(0.045, 10, 8), eyeMaterial, [side * 0.12, 0.26, -0.29]);
+      addPart(`arm-${side}`, new THREE.CapsuleGeometry(0.08, 0.2, 4, 8), bluePaint, [side * 0.36, -0.12, 0], [0, 0, side * 0.12]);
+      addPart(`leg-${side}`, new THREE.CylinderGeometry(0.09, 0.11, 0.16, 12), metalMaterial, [side * 0.14, -0.39, 0]);
+      addPart(`foot-${side}`, new THREE.SphereGeometry(0.1, 12, 8), darkMaterial, [side * 0.14, -0.5, -0.04]);
+  const opening = roomData.openings[0];
+    addPart('antenna', new THREE.CylinderGeometry(0.008, 0.008, 0.3, 8), metalMaterial, [0, 0.57, 0]);
+  if (!opening) return;
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 96;
+  const context = canvas.getContext('2d');
+  if (!context) return;
+  context.fillStyle = '#151b1e';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.strokeStyle = '#e1a65a';
+  context.lineWidth = 5;
+  context.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
+  context.fillStyle = '#e9e6dc';
+  context.font = '600 28px monospace';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(`AUDITORIUM ${String(roomData.number).padStart(2, '0')}`, canvas.width / 2, canvas.height / 2);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthTest: false }));
+  sign.name = `${roomData.id}-sign`;
+  sign.position.set(roomData.x + opening.offset + opening.width / 2, level.elevation + 1.9, roomData.z - 0.2);
+  sign.scale.set(2.5, 0.94, 1);
+  sign.renderOrder = 2;
+  scene.add(sign);
+}
+*/
+
+function addDoorFrame(THREE, scene, door, frameMaterial) {
+  const rotation = door.side === 'east' || door.side === 'west' ? Math.PI / 2 : 0;
+  const group = new THREE.Group();
+  group.name = `${door.id}-frame`;
+  group.position.set(door.position.x, door.position.y, door.position.z);
+  group.rotation.y = rotation;
+  const jambHeight = 2.2;
   const jambWidth = 0.16;
-  const jambGeometry = new THREE.BoxGeometry(jambWidth, jambHeight, zDepth);
+  const jambGeometry = new THREE.BoxGeometry(jambWidth, jambHeight, 0.32);
   for (const side of [-1, 1]) {
     const jamb = new THREE.Mesh(jambGeometry, frameMaterial);
-    jamb.position.set(side * (width / 2 - jambWidth / 2), jambHeight / 2, 0);
+    jamb.position.set(side * (door.width / 2 - jambWidth / 2), jambHeight / 2, 0);
     jamb.castShadow = true;
     group.add(jamb);
   }
-  const lintel = new THREE.Mesh(new THREE.BoxGeometry(width, jambWidth, zDepth), frameMaterial);
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(door.width, jambWidth, 0.32), frameMaterial);
   lintel.position.set(0, jambHeight - jambWidth / 2, 0);
   group.add(lintel);
   scene.add(group);
@@ -109,6 +197,69 @@ function addAuditoriumSign(THREE, scene, roomData, level) {
   sign.scale.set(2.5, 0.94, 1);
   sign.renderOrder = 2;
   scene.add(sign);
+}
+
+function createRobotMesh(THREE, id) {
+  const robot = new THREE.Group();
+  robot.name = `${id}-robot`;
+  const metal = material(THREE, COLORS.rail, { metalness: 0.72, roughness: 0.26 });
+  const dark = material(THREE, COLORS.face, { metalness: 0.2, roughness: 0.42 });
+  const addPart = (name, geometry, meshMaterial, position, rotation = [0, 0, 0]) => {
+    const part = new THREE.Mesh(geometry, meshMaterial);
+    part.name = `${id}-${name}`;
+    part.position.set(...position);
+    part.rotation.set(...rotation);
+    part.castShadow = true;
+    part.receiveShadow = true;
+    robot.add(part);
+    return part;
+  };
+
+  if (id === 'voxxy') {
+    const orange = material(THREE, COLORS.voxxyOrange, { metalness: 0.32, roughness: 0.22 });
+    const eye = new THREE.MeshStandardMaterial({ color: COLORS.amber, emissive: COLORS.amber, emissiveIntensity: 2.8, roughness: 0.2 });
+    const head = addPart('head', new THREE.SphereGeometry(0.32, 20, 14), orange, [0, 0.2, 0]);
+    head.scale.set(1.12, 0.88, 1);
+    const face = addPart('face-screen', new THREE.SphereGeometry(0.245, 20, 12), dark, [0, 0.19, -0.2]);
+    face.scale.set(1.12, 0.7, 0.24);
+    for (const side of [-1, 1]) {
+      addPart(`ear-${side}`, new THREE.SphereGeometry(0.1, 12, 10), orange, [side * 0.22, 0.42, 0]);
+      addPart(`arm-${side}`, new THREE.CapsuleGeometry(0.065, 0.2, 4, 8), orange, [side * 0.28, -0.16, -0.01], [0, 0, side * 0.35]);
+    }
+    addPart('torso', new THREE.ConeGeometry(0.19, 0.38, 16), orange, [0, -0.2, 0]);
+    addPart('left-eye', new THREE.SphereGeometry(0.035, 10, 8), eye, [-0.085, 0.2, -0.255]);
+    addPart('right-eye', new THREE.SphereGeometry(0.035, 10, 8), eye, [0.085, 0.2, -0.255]);
+  } else if (id === 'droid') {
+    const paint = material(THREE, COLORS.droidMetal, { metalness: 0.52, roughness: 0.54 });
+    const eye = new THREE.MeshStandardMaterial({ color: COLORS.amber, emissive: COLORS.amber, emissiveIntensity: 2.1, roughness: 0.2 });
+    addPart('repair-torso', new THREE.BoxGeometry(0.42, 0.38, 0.25), paint, [0, -0.03, 0], [-0.12, 0, 0]);
+    const head = addPart('repair-head', new THREE.SphereGeometry(0.19, 16, 12), paint, [0, 0.34, -0.015]);
+    head.scale.set(0.92, 1.05, 0.88);
+    addPart('repair-visor', new THREE.BoxGeometry(0.22, 0.08, 0.025), dark, [0, 0.34, -0.17]);
+    for (const side of [-1, 1]) {
+      addPart(`eye-${side}`, new THREE.SphereGeometry(0.025, 10, 8), eye, [side * 0.06, 0.35, -0.19]);
+      addPart(`shoulder-${side}`, new THREE.SphereGeometry(0.09, 12, 10), metal, [side * 0.26, 0.08, 0]);
+      addPart(`repair-arm-${side}`, new THREE.CapsuleGeometry(0.04, 0.26, 4, 8), paint, [side * 0.29, -0.16, 0], [0, 0, side * 0.12]);
+      addPart(`repair-leg-${side}`, new THREE.CapsuleGeometry(0.05, 0.2, 4, 8), paint, [side * 0.12, -0.39, 0]);
+      addPart(`foot-${side}`, new THREE.BoxGeometry(0.11, 0.06, 0.16), metal, [side * 0.12, -0.54, -0.025]);
+    }
+  } else {
+    const blue = material(THREE, COLORS.biggyBlue, { metalness: 0.45, roughness: 0.5 });
+    const rust = material(THREE, COLORS.biggyRust, { metalness: 0.36, roughness: 0.58 });
+    const eye = new THREE.MeshStandardMaterial({ color: COLORS.ivory, emissive: COLORS.ivory, emissiveIntensity: 1.6, roughness: 0.22 });
+    const belly = addPart('armored-belly', new THREE.SphereGeometry(0.34, 18, 14), rust, [0, -0.02, -0.015]);
+    belly.scale.set(1.08, 1.02, 0.95);
+    const helmet = addPart('blue-helmet', new THREE.SphereGeometry(0.34, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2), blue, [0, 0.23, 0]);
+    helmet.scale.set(1.05, 0.82, 1);
+    for (const side of [-1, 1]) {
+      addPart(`eye-${side}`, new THREE.SphereGeometry(0.045, 10, 8), eye, [side * 0.12, 0.26, -0.29]);
+      addPart(`arm-${side}`, new THREE.CapsuleGeometry(0.08, 0.2, 4, 8), blue, [side * 0.36, -0.12, 0], [0, 0, side * 0.12]);
+      addPart(`leg-${side}`, new THREE.CylinderGeometry(0.09, 0.11, 0.16, 12), metal, [side * 0.14, -0.39, 0]);
+      addPart(`foot-${side}`, new THREE.SphereGeometry(0.1, 12, 8), dark, [side * 0.14, -0.5, -0.04]);
+    }
+    addPart('antenna', new THREE.CylinderGeometry(0.008, 0.008, 0.3, 8), metal, [0, 0.57, 0]);
+  }
+  return robot;
 }
 
 function addSeating(THREE, scene, seating, elevation, seatMaterial) {
@@ -382,10 +533,8 @@ export function createVenueScene(THREE, layout) {
     biggy: { x: 27, y: layout.levels.ground.elevation, z: 25 }
   };
   for (const [id, point] of Object.entries(spawnPoints)) {
-    const mesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.32, 4, 8), material(THREE, ROBOT_COLORS[id], { metalness: 0.28, roughness: 0.4 }));
-    mesh.name = `${id}-robot`;
+    const mesh = createRobotMesh(THREE, id);
     mesh.position.set(point.x, point.y + 0.4, point.z);
-    mesh.castShadow = true;
     scene.add(mesh);
     point.mesh = mesh;
   }
