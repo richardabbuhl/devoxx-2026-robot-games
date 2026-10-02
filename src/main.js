@@ -131,7 +131,7 @@ function renderMission(state) {
   ui.timer.style.color = state.secondsLeft <= 15 && !state.freeRoam ? 'var(--danger)' : 'var(--amber)';
   ui.status.textContent = state.failed ? 'Shift failed' : state.freeRoam ? 'Free exploration' : state.active ? 'Mission active' : 'Systems asleep';
   ui.missionMessage.textContent = state.message;
-  ui.objectiveCount.textContent = `${state.completedObjectiveIds.length} / ${venueLayout.objectives.length}`;
+  ui.objectiveCount.textContent = `${state.completedObjectiveIds.length} / ${venueLayout.objectives.length} · ${state.sequenceScore} ENERGY`;
   document.querySelectorAll('.crew-card').forEach((card) => {
     const id = card.dataset.select;
     const robot = robotController.robots[id];
@@ -168,8 +168,8 @@ function renderMission(state) {
     ui.againButton.innerHTML = 'Run another shift <span>↻</span>';
     ui.endSignal.textContent = 'CIRCUIT COMPLETE';
     ui.endTitle.innerHTML = 'The building<br><em>is awake.</em>';
-    ui.endCopy.textContent = 'All three systems are online. The building is open to explore.';
-    ui.score.textContent = String(Math.max(72, Math.round((state.secondsLeft / 90) * 100)));
+    ui.endCopy.textContent = `All three systems are online. Your opening sequence stored ${state.sequenceScore} energy.`;
+    ui.score.textContent = String(Math.min(100, Math.round((state.secondsLeft / 90) * 50 + state.sequenceScore / 2)));
     ui.endModal.classList.remove('hidden');
   }
 }

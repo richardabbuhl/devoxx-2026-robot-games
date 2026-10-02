@@ -30,7 +30,9 @@ Then open <http://localhost:8000>. This requires the browser or work network to 
 - Activate a nearby assigned objective: `E` or `Enter`.
 - Restart a shift: the restart button in the status bar.
 
-Voxxy is the orange, bear-eared scout: its exhibition scan lights a cyan guidance trail through the grand stair to the cinema level. Droid is the tall, weathered dark repair unit: it restores the Auditorium 03 projector with three activation pulses, powering its screen. Biggy is the blue-helmeted, orange-bellied heavy unit: build speed, then activate the grand stair gate while moving to bring up the foyer lights. Finish all three before time expires to unlock untimed exploration. A timed-out shift can be restarted.
+Voxxy is the orange, bear-eared scout: its exhibition scan lights a cyan guidance trail through the grand stair to the cinema level. Droid is the tall, weathered dark repair unit: it restores the Auditorium 03 projector with three activation pulses, powering its screen. Biggy is the blue-helmeted, orange-bellied heavy unit: build speed, then activate the grand stair gate while moving to bring up the foyer lights.
+
+The three systems can be completed in any order. Each completion stores opening-sequence energy; following the circuit `Biggy -> Voxxy -> Droid` creates a 40-point chain surge at every link, while other orders remain possible but earn less. Finish all three before time expires to unlock untimed exploration. A timed-out shift can be restarted.
 
 ## Environment Assumptions
 

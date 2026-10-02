@@ -6,8 +6,17 @@ function snapshot(state) {
   return Object.freeze({
     ...state,
     completedObjectiveIds: Object.freeze([...state.completedObjectiveIds]),
+    completionOrder: Object.freeze([...state.completionOrder]),
     interactionProgress: Object.freeze({ ...state.interactionProgress })
   });
+}
+
+const CHAIN_LINKS = Object.freeze({ gate: 'beacon', beacon: 'power', power: 'gate' });
+
+function nextChainObjective(completedObjectiveIds) {
+  const lastObjectiveId = completedObjectiveIds.at(-1);
+  const nextObjectiveId = CHAIN_LINKS[lastObjectiveId];
+  return nextObjectiveId && !completedObjectiveIds.includes(nextObjectiveId) ? nextObjectiveId : null;
 }
 
 export function createMission({ robots, objectives, durationSeconds }) {
@@ -23,8 +32,10 @@ export function createMission({ robots, objectives, durationSeconds }) {
     selectedRobotId: robotList[0]?.id ?? null,
     secondsLeft: initialDuration,
     completedObjectiveIds: [],
+    completionOrder: [],
+    sequenceScore: 0,
     interactionProgress: {},
-    message: 'Select a crew member, then move them to their marked console.'
+    message: 'Choose any specialist. Link their systems to build the opening sequence.'
   };
 
   function publish() {
@@ -84,19 +95,21 @@ export function createMission({ robots, objectives, durationSeconds }) {
       return true;
     }
     state.completedObjectiveIds.push(objectiveId);
+    state.completionOrder.push(objectiveId);
+    const previousObjectiveId = state.completionOrder.at(-2);
+    const linkedObjectiveId = CHAIN_LINKS[previousObjectiveId];
+    const surgeScore = linkedObjectiveId === objectiveId ? 40 : 20;
+    state.sequenceScore += surgeScore;
     delete state.interactionProgress[objectiveId];
-    state.message = `${robot.name} completed ${objective.id}.`;
+    state.message = `${robot.name} completed ${objective.id}. ${surgeScore}-point ${surgeScore === 40 ? 'chain surge' : 'system pulse'}.`;
     if (state.completedObjectiveIds.length === objectiveById.size) {
       state.active = false;
       state.freeRoam = true;
-      state.message = 'All systems online. Free exploration unlocked.';
+      state.message = `Opening sequence complete: ${state.sequenceScore} energy. Free exploration unlocked.`;
     } else {
-      const nextRobot = robotList.find(({ objectiveId: nextObjective }) => !state.completedObjectiveIds.includes(nextObjective));
-      if (nextRobot) {
-        state.selectedRobotId = nextRobot.id;
-        const nextObjective = objectiveById.get(nextRobot.objectiveId);
-        state.message = nextRobot.message ?? `Move ${nextRobot.name} to ${nextObjective?.id ?? 'their objective'}.`;
-      }
+      const nextObjectiveId = nextChainObjective(state.completedObjectiveIds);
+      const nextRobot = robotList.find(({ objectiveId: candidateObjectiveId }) => candidateObjectiveId === nextObjectiveId);
+      if (nextRobot) state.message += ` Link ${nextRobot.name} next for a chain surge.`;
     }
     publish();
     return true;
@@ -129,8 +142,10 @@ export function createMission({ robots, objectives, durationSeconds }) {
       selectedRobotId: robotList[0]?.id ?? null,
       secondsLeft: initialDuration,
       completedObjectiveIds: [],
+      completionOrder: [],
+      sequenceScore: 0,
       interactionProgress: {},
-      message: 'Select a crew member, then move them to their marked console.'
+      message: 'Choose any specialist. Link their systems to build the opening sequence.'
     };
     publish();
     return snapshot(state);

@@ -32,8 +32,10 @@ test('specialist activation completes only a nearby assigned objective', () => {
   assert.equal(mission.state.completedObjectiveIds.length, 0);
   assert.equal(mission.activate({ x: 1.5, y: 0, z: 0 }), true);
   assert.deepEqual(mission.state.completedObjectiveIds, ['beacon']);
-  assert.equal(mission.state.selectedRobotId, 'droid');
-  assert.match(mission.state.message, /Auditorium 03/);
+  assert.deepEqual(mission.state.completionOrder, ['beacon']);
+  assert.equal(mission.state.sequenceScore, 20);
+  assert.equal(mission.state.selectedRobotId, 'voxxy');
+  assert.match(mission.state.message, /Link Droid next/);
   assert.equal(mission.activate({ x: 1.5, y: 0, z: 0 }), false);
 });
 
@@ -49,21 +51,21 @@ test('timer failure stops mission and movement eligibility', () => {
 test('objectives apply their specialist interaction rules before completing', () => {
   const { mission } = createFixture(20);
   mission.start();
+  mission.selectRobot('biggy');
+  mission.activate({ x: 8, y: 0, z: 0 }, { speed: 0.8 });
+  mission.selectRobot('voxxy');
   mission.activate({ x: 1, y: 0, z: 0 });
+  assert.equal(mission.state.sequenceScore, 60);
   mission.selectRobot('droid');
   mission.activate({ x: 4, y: 4.5, z: 0 });
   mission.activate({ x: 4, y: 4.5, z: 0 });
   assert.deepEqual(mission.state.interactionProgress, { power: 2 });
-  assert.equal(mission.state.completedObjectiveIds.length, 1);
-  mission.selectRobot('biggy');
-  assert.equal(mission.activate({ x: 8, y: 0, z: 0 }), false);
-  assert.match(mission.state.message, /keep moving and press E/);
-  assert.equal(mission.activate({ x: 8, y: 0, z: 0 }, { speed: 0.8 }), true);
-  mission.selectRobot('droid');
+  assert.equal(mission.state.completedObjectiveIds.length, 2);
   mission.activate({ x: 4, y: 4.5, z: 0 });
   assert.equal(mission.state.active, false);
   assert.equal(mission.state.freeRoam, true);
   assert.equal(mission.state.completedObjectiveIds.length, 3);
+  assert.equal(mission.state.sequenceScore, 100);
   mission.tick(5);
   assert.equal(mission.state.secondsLeft, 20);
 });
@@ -79,6 +81,7 @@ test('restart clears progress and restores all robot spawns', () => {
   assert.equal(mission.state.freeRoam, false);
   assert.equal(mission.state.secondsLeft, 10);
   assert.deepEqual(mission.state.completedObjectiveIds, []);
+  assert.equal(mission.state.sequenceScore, 0);
   assert.equal(robots[0].x, 1);
   assert.equal(mission.state.selectedRobotId, 'voxxy');
 });
