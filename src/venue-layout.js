@@ -221,7 +221,7 @@ const entrances = [
 
 const objectives = [
   Object.freeze({ id: 'beacon', robotId: 'voxxy', roomId: 'exhibition-hall', level: 'ground', position: Object.freeze({ x: 18, y: 0, z: 25 }) }),
-  Object.freeze({ id: 'power', robotId: 'droid', roomId: 'aud-03', level: 'cinema', position: Object.freeze({ x: 25, y: 4.5, z: 34.5 }), requiredActivations: 3 }),
+  Object.freeze({ id: 'power', robotId: 'droid', roomId: 'aud-03', level: 'cinema', position: Object.freeze({ x: 25, y: 4.5, z: 34.5 }), requiredActivations: 3, timeBonusSeconds: 15 }),
   Object.freeze({ id: 'gate', robotId: 'biggy', roomId: 'exhibition-hall', level: 'ground', position: Object.freeze({ x: 35, y: 0, z: 22 }), minimumSpeed: 0.7 })
 ];
 

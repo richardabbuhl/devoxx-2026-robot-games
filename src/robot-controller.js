@@ -2,8 +2,8 @@ import { floorHeightAt, resolveMovement, stairHeightAt } from './collision.js';
 
 export const ROBOT_SPECS = Object.freeze({
   voxxy: Object.freeze({ id: 'voxxy', name: 'Voxxy', speed: 3, objectiveId: 'beacon', message: 'Scan the beacon in the Exhibition Hall.', color: '#70c8bd' }),
-  droid: Object.freeze({ id: 'droid', name: 'Droid', speed: 1.8, objectiveId: 'power', message: 'Follow the blue beam to Auditorium 03, then repair the projector.', color: '#82a9d5' }),
-  biggy: Object.freeze({ id: 'biggy', name: 'Biggy', speed: 1.24, objectiveId: 'gate', message: 'Follow the orange beam to the grand stair gate. Keep moving and press E at the marker.', color: '#e8784d' })
+  droid: Object.freeze({ id: 'droid', name: 'Droid', speed: 1.8, objectiveId: 'power', message: 'Follow the blue beam to Auditorium 03. Repair the projector to earn a 15-second encore.', color: '#82a9d5' }),
+  biggy: Object.freeze({ id: 'biggy', name: 'Biggy', speed: 1.24, objectiveId: 'gate', message: 'Follow the orange beam to charge the lower gate and unseal the grand stair. Keep moving and press E at the marker.', color: '#e8784d' })
 });
 
 const ACCELERATION = 8;

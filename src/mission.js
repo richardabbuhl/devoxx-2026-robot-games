@@ -99,9 +99,11 @@ export function createMission({ robots, objectives, durationSeconds }) {
     const previousObjectiveId = state.completionOrder.at(-2);
     const linkedObjectiveId = CHAIN_LINKS[previousObjectiveId];
     const surgeScore = linkedObjectiveId === objectiveId ? 40 : 20;
+    const timeBonusSeconds = objective.timeBonusSeconds ?? 0;
     state.sequenceScore += surgeScore;
+    state.secondsLeft += timeBonusSeconds;
     delete state.interactionProgress[objectiveId];
-    state.message = `${robot.name} completed ${objective.id}. ${surgeScore}-point ${surgeScore === 40 ? 'chain surge' : 'system pulse'}.`;
+    state.message = `${robot.name} completed ${objective.id}. ${surgeScore}-point ${surgeScore === 40 ? 'chain surge' : 'system pulse'}.${timeBonusSeconds ? ` Projector encore: +${timeBonusSeconds} seconds.` : ''}`;
     if (state.completedObjectiveIds.length === objectiveById.size) {
       state.active = false;
       state.freeRoam = true;

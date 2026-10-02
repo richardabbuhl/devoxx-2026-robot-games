@@ -23,11 +23,16 @@ test('venue scene is assembled from both levels and shared layout colliders', ()
   assert.equal(result.scene.getObjectByName('voxxy-eye-glow').intensity, 0.8);
   assert.ok(result.scene.getObjectByName('droid-repair-visor'));
   assert.ok(result.scene.getObjectByName('biggy-blue-helmet'));
+  assert.ok(result.scene.getObjectByName('grand-stair-route-lock'));
+  assert.ok(result.colliders.some(({ id }) => id === 'grand-stair-route-lock'));
   assert.equal(result.systemEffects.size, venueLayout.objectives.length);
   result.setCompletedObjectives(['beacon', 'power']);
   assert.equal(result.systemEffects.get('beacon').visible, true);
   assert.equal(result.systemEffects.get('power').visible, true);
   assert.equal(result.systemEffects.get('gate').visible, false);
+  result.setCompletedObjectives(['gate']);
+  assert.equal(result.scene.getObjectByName('grand-stair-route-lock').visible, false);
+  assert.equal(result.colliders.some(({ id }) => id === 'grand-stair-route-lock'), false);
 });
 
 test('scene collider bounds match layout walls and seating banks', () => {

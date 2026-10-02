@@ -438,6 +438,35 @@ export function createVenueScene(THREE, layout) {
     stairs.set(stair.id, addStair(THREE, scene, stair, materials));
   }
 
+  const grandStairGate = new THREE.Group();
+  grandStairGate.name = 'grand-stair-route-lock';
+  const gateMaterial = new THREE.MeshStandardMaterial({
+    color: COLORS.orange,
+    emissive: COLORS.orange,
+    emissiveIntensity: 1.8,
+    metalness: 0.72,
+    roughness: 0.24
+  });
+  for (const offset of [-1.55, -0.78, 0, 0.78, 1.55]) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2, 0.16), gateMaterial);
+    bar.position.set(35 + offset, 5.5, 30.35);
+    bar.castShadow = true;
+    grandStairGate.add(bar);
+  }
+  scene.add(grandStairGate);
+  const grandStairGateCollider = {
+    kind: 'route-lock',
+    id: 'grand-stair-route-lock',
+    level: 'cinema',
+    minX: 33,
+    maxX: 37,
+    minZ: 30.15,
+    maxZ: 30.5,
+    minY: 4.5,
+    maxY: 7
+  };
+  colliders.push(grandStairGateCollider);
+
   for (const roomData of layout.rooms) {
     if (roomData.type === 'corridor' || roomData.type === 'stairwell') continue;
     const level = layout.levels[roomData.level];
@@ -553,6 +582,11 @@ export function createVenueScene(THREE, layout) {
     setCompletedObjectives(completedObjectiveIds) {
       const completed = new Set(completedObjectiveIds);
       for (const [objectiveId, effect] of systemEffects) effect.visible = completed.has(objectiveId);
+      const gateUnlocked = completed.has('gate');
+      grandStairGate.visible = !gateUnlocked;
+      const gateColliderIndex = colliders.indexOf(grandStairGateCollider);
+      if (gateUnlocked && gateColliderIndex >= 0) colliders.splice(gateColliderIndex, 1);
+      if (!gateUnlocked && gateColliderIndex < 0) colliders.push(grandStairGateCollider);
     },
     bounds: { ...layout.bounds },
     stairs,

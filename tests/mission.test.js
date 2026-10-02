@@ -10,7 +10,7 @@ function createFixture(durationSeconds = 10) {
   ];
   const objectives = [
     { id: 'beacon', position: { x: 1, y: 0, z: 0 }, interactionRadius: 2 },
-    { id: 'power', position: { x: 4, y: 4.5, z: 0 }, interactionRadius: 2, requiredActivations: 3 },
+    { id: 'power', position: { x: 4, y: 4.5, z: 0 }, interactionRadius: 2, requiredActivations: 3, timeBonusSeconds: 15 },
     { id: 'gate', position: { x: 8, y: 0, z: 0 }, interactionRadius: 2, minimumSpeed: 0.7 }
   ];
   return { robots, mission: createMission({ robots, objectives, durationSeconds }) };
@@ -67,7 +67,7 @@ test('objectives apply their specialist interaction rules before completing', ()
   assert.equal(mission.state.completedObjectiveIds.length, 3);
   assert.equal(mission.state.sequenceScore, 100);
   mission.tick(5);
-  assert.equal(mission.state.secondsLeft, 20);
+  assert.equal(mission.state.secondsLeft, 35);
 });
 
 test('restart clears progress and restores all robot spawns', () => {
