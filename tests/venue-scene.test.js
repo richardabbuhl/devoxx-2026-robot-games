@@ -17,7 +17,10 @@ test('venue scene is assembled from both levels and shared layout colliders', ()
   assert.ok(result.scene.getObjectByName('grand-stair-treads'));
   assert.ok(result.scene.getObjectByName('aud-03-carpet'));
   assert.ok(result.scene.getObjectByName('power-navigation-beam'));
-  assert.ok(result.scene.getObjectByName('voxxy-face-screen'));
+  const voxxyShield = result.scene.getObjectByName('voxxy-face-screen');
+  assert.equal(voxxyShield.material.color.getHex(), 0x030506);
+  assert.ok(voxxyShield.position.z < -0.25);
+  assert.equal(result.scene.getObjectByName('voxxy-eye-glow').intensity, 0.8);
   assert.ok(result.scene.getObjectByName('droid-repair-visor'));
   assert.ok(result.scene.getObjectByName('biggy-blue-helmet'));
   assert.equal(result.systemEffects.size, venueLayout.objectives.length);

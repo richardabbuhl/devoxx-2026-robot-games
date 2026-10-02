@@ -217,18 +217,23 @@ function createRobotMesh(THREE, id) {
 
   if (id === 'voxxy') {
     const orange = material(THREE, COLORS.voxxyOrange, { metalness: 0.32, roughness: 0.22 });
-    const eye = new THREE.MeshStandardMaterial({ color: COLORS.amber, emissive: COLORS.amber, emissiveIntensity: 2.8, roughness: 0.2 });
+    const faceShield = material(THREE, 0x030506, { metalness: 0.58, roughness: 0.14 });
+    const eye = new THREE.MeshStandardMaterial({ color: COLORS.amber, emissive: COLORS.amber, emissiveIntensity: 5.5, roughness: 0.16 });
     const head = addPart('head', new THREE.SphereGeometry(0.32, 20, 14), orange, [0, 0.2, 0]);
     head.scale.set(1.12, 0.88, 1);
-    const face = addPart('face-screen', new THREE.SphereGeometry(0.245, 20, 12), dark, [0, 0.19, -0.2]);
-    face.scale.set(1.12, 0.7, 0.24);
+    const face = addPart('face-screen', new THREE.SphereGeometry(0.265, 20, 12), faceShield, [0, 0.19, -0.3]);
+    face.scale.set(1.1, 0.68, 0.22);
     for (const side of [-1, 1]) {
       addPart(`ear-${side}`, new THREE.SphereGeometry(0.1, 12, 10), orange, [side * 0.22, 0.42, 0]);
       addPart(`arm-${side}`, new THREE.CapsuleGeometry(0.065, 0.2, 4, 8), orange, [side * 0.28, -0.16, -0.01], [0, 0, side * 0.35]);
     }
     addPart('torso', new THREE.ConeGeometry(0.19, 0.38, 16), orange, [0, -0.2, 0]);
-    addPart('left-eye', new THREE.SphereGeometry(0.035, 10, 8), eye, [-0.085, 0.2, -0.255]);
-    addPart('right-eye', new THREE.SphereGeometry(0.035, 10, 8), eye, [0.085, 0.2, -0.255]);
+    addPart('left-eye', new THREE.SphereGeometry(0.045, 10, 8), eye, [-0.09, 0.2, -0.37]);
+    addPart('right-eye', new THREE.SphereGeometry(0.045, 10, 8), eye, [0.09, 0.2, -0.37]);
+    const eyeGlow = new THREE.PointLight(COLORS.amber, 0.8, 1.2, 2);
+    eyeGlow.name = 'voxxy-eye-glow';
+    eyeGlow.position.set(0, 0.2, -0.4);
+    robot.add(eyeGlow);
   } else if (id === 'droid') {
     const paint = material(THREE, COLORS.droidMetal, { metalness: 0.52, roughness: 0.54 });
     const eye = new THREE.MeshStandardMaterial({ color: COLORS.amber, emissive: COLORS.amber, emissiveIntensity: 2.1, roughness: 0.2 });

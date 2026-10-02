@@ -58,6 +58,8 @@ test('keyboard input moves the selected robot and selection switches specialists
     id,
     { ...venueLayout.objectives.find(({ robotId }) => robotId === id).position }
   ]));
+  const voxxyMesh = { position: { set() {} }, rotation: { y: null } };
+  spawnPoints.voxxy = { x: 8, y: 0, z: 25, mesh: voxxyMesh };
   const controller = createRobotController({
     THREE: null,
     camera: null,
@@ -66,10 +68,12 @@ test('keyboard input moves the selected robot and selection switches specialists
     colliders: [],
     spawnPoints
   });
+  assert.ok(Math.abs(voxxyMesh.rotation.y + Math.PI / 2) < 1e-9);
   const startZ = controller.robots.voxxy.z;
   controller.setInput('W', true);
   controller.update(0.08);
   assert.ok(controller.robots.voxxy.z < startZ);
+  assert.ok(Math.abs(voxxyMesh.rotation.y) < 1e-9);
   assert.equal(controller.selectRobot('droid'), true);
   assert.equal(controller.activeRobotId, 'droid');
 });

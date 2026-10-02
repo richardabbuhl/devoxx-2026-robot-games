@@ -80,6 +80,13 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
       mesh: spawn.mesh
     }];
   }));
+  for (const robot of Object.values(robots)) {
+    const objective = layout.objectives?.find(({ id }) => id === robot.objectiveId);
+    if (!robot.mesh || !objective) continue;
+    const targetX = objective.position.x - robot.x;
+    const targetZ = objective.position.z - robot.z;
+    if (Math.hypot(targetX, targetZ) > 0.01) robot.mesh.rotation.y = Math.atan2(-targetX, -targetZ);
+  }
   const keys = new Set();
   let selectedRobotId = 'voxxy';
 
@@ -104,7 +111,7 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
     Object.assign(robot, next);
     if (robot.mesh) {
       robot.mesh.position.set(robot.x, robot.y + robot.height / 2, robot.z);
-      if (Math.hypot(robot.vx, robot.vz) > 0.01) robot.mesh.rotation.y = Math.atan2(robot.vx, robot.vz);
+      if (Math.hypot(robot.vx, robot.vz) > 0.01) robot.mesh.rotation.y = Math.atan2(-robot.vx, -robot.vz);
     }
     if (camera && THREE) {
       const cameraConfig = cameraFollowConfiguration(robot, layout);
