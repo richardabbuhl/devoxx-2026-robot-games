@@ -1,8 +1,8 @@
-import { floorHeightAt, resolveMovement } from './collision.js';
+import { floorHeightAt, resolveMovement, stairHeightAt } from './collision.js';
 
 export const ROBOT_SPECS = Object.freeze({
   voxxy: Object.freeze({ id: 'voxxy', name: 'Voxxy', speed: 3, objectiveId: 'beacon', message: 'Scan the beacon in the Exhibition Hall.', color: '#70c8bd' }),
-  droid: Object.freeze({ id: 'droid', name: 'Droid', speed: 1.8, objectiveId: 'power', message: 'Repair the projector by Auditorium 03.', color: '#82a9d5' }),
+  droid: Object.freeze({ id: 'droid', name: 'Droid', speed: 1.8, objectiveId: 'power', message: 'Follow the blue beam to Auditorium 03, then repair the projector.', color: '#82a9d5' }),
   biggy: Object.freeze({ id: 'biggy', name: 'Biggy', speed: 1.24, objectiveId: 'gate', message: 'Charge the grand stair gate.', color: '#e8784d' })
 });
 
@@ -45,6 +45,22 @@ function movementInputValue(keys) {
   return {
     x: Number(keys.has('d') || keys.has('arrowright')) - Number(keys.has('a') || keys.has('arrowleft')),
     z: Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'))
+  };
+}
+
+export function cameraFollowConfiguration(robot, layout) {
+  const isOnStair = (layout.stairs ?? []).some((stair) => (
+    stairHeightAt(robot.x, robot.z, stair, robot.radius ?? 0) !== null
+  ));
+  if (isOnStair) {
+    return {
+      target: { x: robot.x, y: robot.y + 0.4, z: robot.z },
+      position: { x: robot.x + 7, y: robot.y + 12, z: robot.z + 10 }
+    };
+  }
+  return {
+    target: { x: robot.x, y: robot.y + 0.55, z: robot.z },
+    position: { x: robot.x + 5.6, y: robot.y + (robot.y < 4.5 ? 3.2 : 6), z: robot.z + 8.5 }
   };
 }
 
@@ -91,9 +107,9 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
       if (Math.hypot(robot.vx, robot.vz) > 0.01) robot.mesh.rotation.y = Math.atan2(robot.vx, robot.vz);
     }
     if (camera && THREE) {
-      const target = new THREE.Vector3(robot.x, robot.y + 0.55, robot.z);
-      const cameraHeight = robot.y < 4.5 ? 3.2 : 6;
-      const desiredPosition = new THREE.Vector3(robot.x + 5.6, robot.y + cameraHeight, robot.z + 8.5);
+      const cameraConfig = cameraFollowConfiguration(robot, layout);
+      const target = new THREE.Vector3(cameraConfig.target.x, cameraConfig.target.y, cameraConfig.target.z);
+      const desiredPosition = new THREE.Vector3(cameraConfig.position.x, cameraConfig.position.y, cameraConfig.position.z);
       camera.position.lerp(desiredPosition, 1 - Math.exp(-4 * Math.min(deltaSeconds, 0.1)));
       camera.lookAt(target);
     }

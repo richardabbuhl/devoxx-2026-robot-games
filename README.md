@@ -30,7 +30,7 @@ Then open <http://localhost:8000>. This requires the browser or work network to 
 - Activate a nearby assigned objective: `E` or `Enter`.
 - Restart a shift: the restart button in the status bar.
 
-Voxxy scans the exhibition beacon, Droid repairs the projector by Auditorium 03, and Biggy charges the grand stair gate. Finish all three before time expires to unlock untimed exploration. A timed-out shift can be restarted.
+Voxxy scans the exhibition beacon instantly, lighting a cyan guidance trail through the grand stair to the cinema level. Droid repairs the projector by Auditorium 03 with three activation pulses, powering its screen. Biggy charges the grand stair gate only while moving: build speed, then activate it as he reaches the marker to bring up the foyer lights. Finish all three before time expires to unlock untimed exploration. A timed-out shift can be restarted.
 
 ## Environment Assumptions
 
@@ -52,4 +52,4 @@ Venue layout references: `github/assets/maps/exhibition-floor.jpg`, `hollywood-a
 The browser game uses JavaScript ES modules, Three.js, and Vite. GitHub Copilot assisted with the procedural geometry, collision model, and tests. Iterations added explicit wall gaps at doors, split auditorium seating around aisles, floor-specific walkable regions, and a ramp-aligned stair after testing exposed route and collision edge cases. The plan-derived geometry and all dimensions were reviewed and adjusted by hand; measurements should not be treated as surveyed.
 
 See [`GAME-INSTRUCTIONS.md`](GAME-INSTRUCTIONS.md) for the competition brief and constraints.
-See [`docs/superpowers/specs/Prompts.md`](docs/superpowers/specs/Prompts.md) for the original environment prompt, gameplay direction, and modeling iterations.
+See [`docs/superpowers/specs/2026-09-30-Prompts.md`](docs/superpowers/specs/2026-09-30-Prompts.md) for the original environment prompt, gameplay direction, and modeling iterations.

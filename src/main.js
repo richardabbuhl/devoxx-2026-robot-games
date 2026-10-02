@@ -20,6 +20,9 @@ const ui = {
   missionMessage: document.querySelector('#mission-message'),
   objectiveCount: document.querySelector('#objective-count'),
   coordinateReadout: document.querySelector('#coordinate-readout'),
+  objectiveLocator: document.querySelector('#objective-locator'),
+  objectiveArrow: document.querySelector('#objective-arrow'),
+  objectiveCopy: document.querySelector('#objective-copy'),
   endSignal: document.querySelector('#end-signal'),
   endTitle: document.querySelector('#end-title'),
   endCopy: document.querySelector('#end-copy'),
@@ -94,6 +97,30 @@ function updateCoordinateReadout() {
   ui.coordinateReadout.dataset.z = robot.z.toFixed(2);
 }
 
+function updateObjectiveLocator(state) {
+  const robot = robotController.robots[robotController.activeRobotId];
+  const objective = venueLayout.objectives.find(({ id }) => id === robot?.objectiveId);
+  if (!robot || !objective || state.completedObjectiveIds.includes(objective.id) || state.freeRoam) {
+    ui.objectiveLocator.hidden = true;
+    return;
+  }
+  const room = venueLayout.rooms.find(({ id }) => id === objective.roomId);
+  const targetX = objective.position.x - robot.x;
+  const targetZ = objective.position.z - robot.z;
+  const targetLength = Math.hypot(targetX, targetZ);
+  const forward = new THREE.Vector3();
+  camera.getWorldDirection(forward);
+  const forwardLength = Math.hypot(forward.x, forward.z);
+  const dot = forwardLength && targetLength
+    ? (forward.x * targetX + forward.z * targetZ) / (forwardLength * targetLength)
+    : 1;
+  const cross = forward.x * targetZ - forward.z * targetX;
+  ui.objectiveArrow.style.transform = `rotate(${Math.atan2(cross, dot)}rad)`;
+  ui.objectiveLocator.style.setProperty('--objective-color', robot.color);
+  ui.objectiveCopy.textContent = `${robot.name.toUpperCase()} TARGET / ${room?.name?.toUpperCase() ?? objective.id.toUpperCase()}`;
+  ui.objectiveLocator.hidden = false;
+}
+
 function hideEndModal() {
   ui.endModal.classList.add('hidden');
   missionWasFailed = false;
@@ -118,8 +145,10 @@ function renderMission(state) {
     const marker = venue.objectiveMarkers.get(objective.id);
     if (marker) marker.visible = !state.completedObjectiveIds.includes(objective.id);
   }
+  venue.setCompletedObjectives(state.completedObjectiveIds);
   if (robotController.activeRobotId !== state.selectedRobotId) robotController.selectRobot(state.selectedRobotId);
   updateCoordinateReadout();
+  updateObjectiveLocator(state);
   if (state.failed && !missionWasFailed) {
     missionWasFailed = true;
     ui.exploreButton.classList.add('hidden');
@@ -161,7 +190,10 @@ function resetGame(showStart = true) {
 
 function activateSelectedRobot() {
   const robot = robotController.robots[robotController.activeRobotId];
-  mission.activate({ x: robot.x, y: robot.y, z: robot.z });
+  mission.activate(
+    { x: robot.x, y: robot.y, z: robot.z },
+    { speed: Math.hypot(robot.vx, robot.vz) }
+  );
 }
 
 document.querySelectorAll('[data-select]').forEach((card) => {
@@ -246,6 +278,7 @@ function animate(timestamp) {
   if (state.active || state.freeRoam) {
     robotController.update(deltaSeconds);
     updateCoordinateReadout();
+    updateObjectiveLocator(state);
   }
   renderer.render(venue.scene, camera);
   frameId = window.requestAnimationFrame(animate);

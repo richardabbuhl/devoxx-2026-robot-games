@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { advanceRobotState, createRobotController, ROBOT_SPECS } from '../src/robot-controller.js';
+import { advanceRobotState, cameraFollowConfiguration, createRobotController, ROBOT_SPECS } from '../src/robot-controller.js';
 import { venueLayout } from '../src/venue-layout.js';
 
 test('robot specialists retain distinct speeds', () => {
@@ -37,6 +37,20 @@ test('robots climb and descend the grand stair without changing X/Z by teleporta
   const descending = advanceRobotState({ x: stair.upper.x, y: stair.upper.y, z: stair.upper.z, vx: 0, vz: 0, speed: 3 }, { x: 0, z: -1 }, 1, venueLayout, []);
   assert.ok(descending.z < stair.upper.z);
   assert.ok(descending.y < stair.upper.y && descending.y > stair.lower.y);
+});
+
+test('camera rises above the stairwell to preserve a clear descent view', () => {
+  const stair = venueLayout.stairs[0];
+  const robot = {
+    x: stair.lower.x,
+    y: stair.lower.y,
+    z: (stair.lower.z + stair.upper.z) / 2,
+    radius: 0.275
+  };
+  const camera = cameraFollowConfiguration(robot, venueLayout);
+  assert.ok(camera.position.y - robot.y >= 12);
+  assert.ok(camera.position.z > robot.z);
+  assert.ok(camera.target.y > robot.y);
 });
 
 test('keyboard input moves the selected robot and selection switches specialists', () => {

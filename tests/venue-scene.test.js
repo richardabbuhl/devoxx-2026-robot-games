@@ -16,6 +16,12 @@ test('venue scene is assembled from both levels and shared layout colliders', ()
   assert.equal(result.spawnPoints.droid.y, venueLayout.levels.cinema.elevation);
   assert.ok(result.scene.getObjectByName('grand-stair-treads'));
   assert.ok(result.scene.getObjectByName('aud-03-carpet'));
+  assert.ok(result.scene.getObjectByName('power-navigation-beam'));
+  assert.equal(result.systemEffects.size, venueLayout.objectives.length);
+  result.setCompletedObjectives(['beacon', 'power']);
+  assert.equal(result.systemEffects.get('beacon').visible, true);
+  assert.equal(result.systemEffects.get('power').visible, true);
+  assert.equal(result.systemEffects.get('gate').visible, false);
 });
 
 test('scene collider bounds match layout walls and seating banks', () => {

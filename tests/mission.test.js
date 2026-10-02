@@ -10,8 +10,8 @@ function createFixture(durationSeconds = 10) {
   ];
   const objectives = [
     { id: 'beacon', position: { x: 1, y: 0, z: 0 }, interactionRadius: 2 },
-    { id: 'power', position: { x: 4, y: 4.5, z: 0 }, interactionRadius: 2 },
-    { id: 'gate', position: { x: 8, y: 0, z: 0 }, interactionRadius: 2 }
+    { id: 'power', position: { x: 4, y: 4.5, z: 0 }, interactionRadius: 2, requiredActivations: 3 },
+    { id: 'gate', position: { x: 8, y: 0, z: 0 }, interactionRadius: 2, minimumSpeed: 0.7 }
   ];
   return { robots, mission: createMission({ robots, objectives, durationSeconds }) };
 }
@@ -46,14 +46,21 @@ test('timer failure stops mission and movement eligibility', () => {
   assert.equal(mission.state.freeRoam, false);
 });
 
-test('three objectives stop the clock and unlock free exploration', () => {
+test('objectives apply their specialist interaction rules before completing', () => {
   const { mission } = createFixture(20);
   mission.start();
   mission.activate({ x: 1, y: 0, z: 0 });
   mission.selectRobot('droid');
   mission.activate({ x: 4, y: 4.5, z: 0 });
+  mission.activate({ x: 4, y: 4.5, z: 0 });
+  assert.deepEqual(mission.state.interactionProgress, { power: 2 });
+  assert.equal(mission.state.completedObjectiveIds.length, 1);
   mission.selectRobot('biggy');
-  mission.activate({ x: 8, y: 0, z: 0 });
+  assert.equal(mission.activate({ x: 8, y: 0, z: 0 }), false);
+  assert.match(mission.state.message, /more momentum/);
+  assert.equal(mission.activate({ x: 8, y: 0, z: 0 }, { speed: 0.8 }), true);
+  mission.selectRobot('droid');
+  mission.activate({ x: 4, y: 4.5, z: 0 });
   assert.equal(mission.state.active, false);
   assert.equal(mission.state.freeRoam, true);
   assert.equal(mission.state.completedObjectiveIds.length, 3);

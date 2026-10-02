@@ -5,7 +5,8 @@ function asRobotList(robots) {
 function snapshot(state) {
   return Object.freeze({
     ...state,
-    completedObjectiveIds: Object.freeze([...state.completedObjectiveIds])
+    completedObjectiveIds: Object.freeze([...state.completedObjectiveIds]),
+    interactionProgress: Object.freeze({ ...state.interactionProgress })
   });
 }
 
@@ -22,6 +23,7 @@ export function createMission({ robots, objectives, durationSeconds }) {
     selectedRobotId: robotList[0]?.id ?? null,
     secondsLeft: initialDuration,
     completedObjectiveIds: [],
+    interactionProgress: {},
     message: 'Select a crew member, then move them to their marked console.'
   };
 
@@ -51,7 +53,7 @@ export function createMission({ robots, objectives, durationSeconds }) {
     return true;
   }
 
-  function activate(position) {
+  function activate(position, { speed = 0 } = {}) {
     if (!state.active) return false;
     const robot = robotById.get(state.selectedRobotId);
     const objectiveId = robot?.objectiveId;
@@ -67,7 +69,22 @@ export function createMission({ robots, objectives, durationSeconds }) {
       publish();
       return false;
     }
+    const minimumSpeed = objective.minimumSpeed ?? 0;
+    if (speed < minimumSpeed) {
+      state.message = `${robot.name} needs more momentum to activate ${objective.id}.`;
+      publish();
+      return false;
+    }
+    const requiredActivations = objective.requiredActivations ?? 1;
+    const activations = (state.interactionProgress[objectiveId] ?? 0) + 1;
+    if (activations < requiredActivations) {
+      state.interactionProgress[objectiveId] = activations;
+      state.message = `${robot.name} is repairing ${objective.id}: ${activations} / ${requiredActivations}.`;
+      publish();
+      return true;
+    }
     state.completedObjectiveIds.push(objectiveId);
+    delete state.interactionProgress[objectiveId];
     state.message = `${robot.name} completed ${objective.id}.`;
     if (state.completedObjectiveIds.length === objectiveById.size) {
       state.active = false;
@@ -112,6 +129,7 @@ export function createMission({ robots, objectives, durationSeconds }) {
       selectedRobotId: robotList[0]?.id ?? null,
       secondsLeft: initialDuration,
       completedObjectiveIds: [],
+      interactionProgress: {},
       message: 'Select a crew member, then move them to their marked console.'
     };
     publish();

@@ -82,6 +82,35 @@ function addDoorFrame(THREE, scene, door, frameMaterial) {
   scene.add(group);
 }
 
+function addAuditoriumSign(THREE, scene, roomData, level) {
+  if (typeof document === 'undefined') return;
+  const opening = roomData.openings[0];
+  if (!opening) return;
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 96;
+  const context = canvas.getContext('2d');
+  if (!context) return;
+  context.fillStyle = '#151b1e';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.strokeStyle = '#e1a65a';
+  context.lineWidth = 5;
+  context.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
+  context.fillStyle = '#e9e6dc';
+  context.font = '600 28px monospace';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(`AUDITORIUM ${String(roomData.number).padStart(2, '0')}`, canvas.width / 2, canvas.height / 2);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthTest: false }));
+  sign.name = `${roomData.id}-sign`;
+  sign.position.set(roomData.x + opening.offset + opening.width / 2, level.elevation + 1.9, roomData.z - 0.2);
+  sign.scale.set(2.5, 0.94, 1);
+  sign.renderOrder = 2;
+  scene.add(sign);
+}
+
 function addSeating(THREE, scene, seating, elevation, seatMaterial) {
   const width = seating.bounds.maxX - seating.bounds.minX;
   const depth = seating.bounds.maxZ - seating.bounds.minZ;
@@ -226,6 +255,9 @@ export function createVenueScene(THREE, layout) {
   }
 
   for (const door of layout.doors) addDoorFrame(THREE, scene, door, materials.frame);
+  for (const auditorium of layout.rooms.filter(({ type }) => type === 'auditorium')) {
+    addAuditoriumSign(THREE, scene, auditorium, layout.levels[auditorium.level]);
+  }
 
   let totalSeatCount = 0;
   for (const seating of layout.seating) {
@@ -273,6 +305,12 @@ export function createVenueScene(THREE, layout) {
       metalness: 0.5,
       roughness: 0.25
     });
+    const beamMaterial = new THREE.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity: 0.48,
+      depthWrite: false
+    });
     const marker = new THREE.Group();
     marker.name = `${objective.id}-objective-marker`;
     marker.position.set(objective.position.x, objective.position.y, objective.position.z);
@@ -281,10 +319,62 @@ export function createVenueScene(THREE, layout) {
     ring.position.y = 0.06;
     const beacon = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.12, 0.72, 12), markerMaterial);
     beacon.position.y = 0.48;
-    marker.add(ring, beacon);
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.34, 8.5, 16, 1, true), beamMaterial);
+    beam.name = `${objective.id}-navigation-beam`;
+    beam.position.y = 4.25;
+    marker.add(ring, beacon, beam);
     scene.add(marker);
     objectiveMarkers.set(objective.id, marker);
   }
+
+  const systemEffects = new Map();
+  const routeGuidance = new THREE.Group();
+  routeGuidance.name = 'beacon-route-guidance';
+  routeGuidance.visible = false;
+  const routeMaterial = new THREE.MeshStandardMaterial({
+    color: COLORS.cyan,
+    emissive: COLORS.cyan,
+    emissiveIntensity: 2.2,
+    roughness: 0.32
+  });
+  for (const point of [
+    { x: 23, y: 0.12, z: 25 }, { x: 29, y: 0.12, z: 25 }, { x: 34, y: 0.12, z: 24 },
+    { x: 35, y: 2.35, z: 26.25 }, { x: 35, y: 4.62, z: 30.5 }, { x: 29, y: 4.62, z: 32 }
+  ]) {
+    const node = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.06, 12), routeMaterial);
+    node.position.set(point.x, point.y, point.z);
+    routeGuidance.add(node);
+  }
+  scene.add(routeGuidance);
+  systemEffects.set('beacon', routeGuidance);
+
+  const cinemaScreen = new THREE.Group();
+  cinemaScreen.name = 'power-auditorium-screen';
+  cinemaScreen.visible = false;
+  const screenMaterial = new THREE.MeshStandardMaterial({
+    color: COLORS.blue,
+    emissive: COLORS.blue,
+    emissiveIntensity: 2.4,
+    roughness: 0.2
+  });
+  const screen = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.5, 0.08), screenMaterial);
+  screen.position.set(25.5, 6.3, 45.78);
+  const projectorGlow = new THREE.PointLight(COLORS.blue, 18, 12, 2);
+  projectorGlow.position.set(25.5, 6.1, 42);
+  cinemaScreen.add(screen, projectorGlow);
+  scene.add(cinemaScreen);
+  systemEffects.set('power', cinemaScreen);
+
+  const foyerLights = new THREE.Group();
+  foyerLights.name = 'gate-foyer-lights';
+  foyerLights.visible = false;
+  for (const position of [{ x: 32, y: 7, z: 27 }, { x: 38, y: 7, z: 27 }]) {
+    const light = new THREE.PointLight(COLORS.orange, 18, 14, 2);
+    light.position.set(position.x, position.y, position.z);
+    foyerLights.add(light);
+  }
+  scene.add(foyerLights);
+  systemEffects.set('gate', foyerLights);
 
   const spawnPoints = {
     voxxy: { x: 8, y: layout.levels.ground.elevation, z: 25 },
@@ -305,6 +395,11 @@ export function createVenueScene(THREE, layout) {
     colliders,
     spawnPoints,
     objectiveMarkers,
+    systemEffects,
+    setCompletedObjectives(completedObjectiveIds) {
+      const completed = new Set(completedObjectiveIds);
+      for (const [objectiveId, effect] of systemEffects) effect.visible = completed.has(objectiveId);
+    },
     bounds: { ...layout.bounds },
     stairs,
     totalSeatCount
