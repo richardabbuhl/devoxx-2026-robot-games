@@ -57,7 +57,7 @@ test('objectives apply their specialist interaction rules before completing', ()
   assert.equal(mission.state.completedObjectiveIds.length, 1);
   mission.selectRobot('biggy');
   assert.equal(mission.activate({ x: 8, y: 0, z: 0 }), false);
-  assert.match(mission.state.message, /more momentum/);
+  assert.match(mission.state.message, /keep moving and press E/);
   assert.equal(mission.activate({ x: 8, y: 0, z: 0 }, { speed: 0.8 }), true);
   mission.selectRobot('droid');
   mission.activate({ x: 4, y: 4.5, z: 0 });

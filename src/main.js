@@ -143,7 +143,10 @@ function renderMission(state) {
   });
   for (const objective of venueLayout.objectives) {
     const marker = venue.objectiveMarkers.get(objective.id);
-    if (marker) marker.visible = !state.completedObjectiveIds.includes(objective.id);
+    if (marker) {
+      marker.visible = !state.completedObjectiveIds.includes(objective.id)
+        && objective.robotId === state.selectedRobotId;
+    }
   }
   venue.setCompletedObjectives(state.completedObjectiveIds);
   if (robotController.activeRobotId !== state.selectedRobotId) robotController.selectRobot(state.selectedRobotId);
