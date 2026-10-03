@@ -49,22 +49,27 @@ function movementInputValue(keys) {
 }
 
 export function cameraFollowConfiguration(robot, layout, { portrait = false } = {}) {
-  const isOnStair = (layout.stairs ?? []).some((stair) => (
+  const activeStair = (layout.stairs ?? []).find((stair) => (
     stairHeightAt(robot.x, robot.z, stair, robot.radius ?? 0) !== null
   ));
-  if (isOnStair) {
+  if (activeStair) {
+    const stairProgress = (robot.y - activeStair.lower.y) / (activeStair.upper.y - activeStair.lower.y);
+    const cameraZOffset = stairProgress < 0.35 ? -7 : 7;
     return {
       target: { x: robot.x, y: robot.y + 0.4, z: robot.z },
       position: portrait
-        ? { x: robot.x + 5, y: robot.y + 9, z: robot.z + 7 }
+        ? { x: robot.x + 5, y: robot.y + 9, z: robot.z + cameraZOffset }
         : { x: robot.x + 7, y: robot.y + 12, z: robot.z + 10 }
     };
   }
   const isUpperLevel = robot.y >= 4.5;
+  const objective = (layout.objectives ?? []).find(({ id }) => id === robot.objectiveId);
+  const isNearLowerGate = objective?.id === 'gate'
+    && Math.hypot(robot.x - objective.position.x, robot.z - objective.position.z) <= 3;
   return {
     target: { x: robot.x, y: robot.y + 0.55, z: robot.z },
     position: portrait
-      ? { x: robot.x + 3.7, y: robot.y + (isUpperLevel ? 4.2 : 2.8), z: robot.z + 5.6 }
+      ? { x: robot.x + 3.7, y: robot.y + (isUpperLevel ? 4.2 : 2.8), z: robot.z + (isNearLowerGate ? -5.6 : 5.6) }
       : { x: robot.x + 5.6, y: robot.y + (isUpperLevel ? 6 : 3.2), z: robot.z + 8.5 }
   };
 }

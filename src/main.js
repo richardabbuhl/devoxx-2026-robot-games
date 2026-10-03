@@ -8,6 +8,9 @@ import { stairHeightAt } from './collision.js';
 const gameView = document.querySelector('#game-view');
 if (!gameView) throw new Error('Missing #game-view mount point.');
 
+const objectiveLabels = { beacon: 'beacon', power: 'projector', gate: 'stair gate' };
+const interactionRadius = 2.2;
+
 const ui = {
   startModal: document.querySelector('#start-modal'),
   endModal: document.querySelector('#end-modal'),
@@ -57,7 +60,7 @@ const robotController = createRobotController({
 });
 const mission = createMission({
   robots: robotController.robots,
-  objectives: venueLayout.objectives.map((objective) => ({ ...objective, interactionRadius: 2.2 })),
+  objectives: venueLayout.objectives.map((objective) => ({ ...objective, interactionRadius })),
   durationSeconds: 90
 });
 
@@ -103,12 +106,17 @@ function updateObjectiveLocator(state) {
   const objective = venueLayout.objectives.find(({ id }) => id === robot?.objectiveId);
   if (!robot || !objective || state.completedObjectiveIds.includes(objective.id) || state.freeRoam) {
     ui.objectiveLocator.hidden = true;
+    ui.touchActivate.textContent = objective && state.completedObjectiveIds.includes(objective.id) ? '✓ Online' : '◎ Activate';
+    ui.touchActivate.disabled = Boolean(objective && state.completedObjectiveIds.includes(objective.id));
+    ui.touchActivate.dataset.ready = 'false';
     return;
   }
-  const room = venueLayout.rooms.find(({ id }) => id === objective.roomId);
   const targetX = objective.position.x - robot.x;
   const targetZ = objective.position.z - robot.z;
   const targetLength = Math.hypot(targetX, targetZ);
+  const distance = Math.hypot(targetX, objective.position.y - robot.y, targetZ);
+  const isInRange = distance <= interactionRadius;
+  const objectiveLabel = objectiveLabels[objective.id] ?? objective.id;
   const forward = new THREE.Vector3();
   camera.getWorldDirection(forward);
   const forwardLength = Math.hypot(forward.x, forward.z);
@@ -118,7 +126,12 @@ function updateObjectiveLocator(state) {
   const cross = forward.x * targetZ - forward.z * targetX;
   ui.objectiveArrow.style.transform = `rotate(${Math.atan2(cross, dot)}rad)`;
   ui.objectiveLocator.style.setProperty('--objective-color', robot.color);
-  ui.objectiveCopy.textContent = `${robot.name.toUpperCase()} TARGET / ${room?.name?.toUpperCase() ?? objective.id.toUpperCase()}`;
+  ui.objectiveCopy.textContent = isInRange
+    ? `${objectiveLabel.toUpperCase()} / ACTIVATE NOW`
+    : `${robot.name.toUpperCase()} → ${objectiveLabel.toUpperCase()} / ${Math.ceil(distance)}m`;
+  ui.touchActivate.textContent = isInRange ? `◎ Activate ${robot.name}` : `${objectiveLabel} ${Math.ceil(distance)}m`;
+  ui.touchActivate.disabled = false;
+  ui.touchActivate.dataset.ready = String(isInRange);
   ui.objectiveLocator.hidden = false;
 }
 

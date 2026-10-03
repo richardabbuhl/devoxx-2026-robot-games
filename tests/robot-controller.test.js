@@ -66,6 +66,21 @@ test('portrait camera moves closer while preserving an elevated view', () => {
   assert.ok(portrait.position.y > portrait.target.y);
 });
 
+test('portrait camera views the lower stair from the unobstructed approach side', () => {
+  const stair = venueLayout.stairs[0];
+  const robot = { x: stair.lower.x, y: stair.lower.y, z: stair.lower.z, radius: 0.275 };
+  const camera = cameraFollowConfiguration(robot, venueLayout, { portrait: true });
+  assert.ok(camera.position.z < robot.z);
+  assert.ok(camera.position.y > robot.y);
+});
+
+test('portrait camera keeps Biggy visible from the approach side at the gate marker', () => {
+  const gate = venueLayout.objectives.find(({ id }) => id === 'gate');
+  const robot = { ...gate.position, objectiveId: gate.id, radius: 0.275 };
+  const camera = cameraFollowConfiguration(robot, venueLayout, { portrait: true });
+  assert.ok(camera.position.z < robot.z);
+});
+
 test('keyboard input moves the selected robot and selection switches specialists', () => {
   const spawnPoints = Object.fromEntries(Object.values(ROBOT_SPECS).map(({ id }) => [
     id,
