@@ -543,8 +543,10 @@ export function createVenueScene(THREE, layout) {
     roughness: 0.2
   });
   const screen = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.5, 0.08), screenMaterial);
+  screen.name = 'power-screen';
   screen.position.set(25.5, 6.3, 45.78);
   const projectorGlow = new THREE.PointLight(COLORS.blue, 18, 12, 2);
+  projectorGlow.name = 'power-projector-glow';
   projectorGlow.position.set(25.5, 6.1, 42);
   cinemaScreen.add(screen, projectorGlow);
   scene.add(cinemaScreen);
@@ -579,6 +581,26 @@ export function createVenueScene(THREE, layout) {
     spawnPoints,
     objectiveMarkers,
     systemEffects,
+    updateEffects(elapsedSeconds) {
+      const pulse = 1 + Math.sin(elapsedSeconds * 5) * 0.08;
+      const route = systemEffects.get('beacon');
+      if (route?.visible) {
+        route.rotation.y = elapsedSeconds * 0.35;
+        route.scale.setScalar(pulse);
+      }
+      const screenGroup = systemEffects.get('power');
+      if (screenGroup?.visible) {
+        const screenMesh = screenGroup.getObjectByName('power-screen');
+        const projectorGlow = screenGroup.getObjectByName('power-projector-glow');
+        if (screenMesh?.material) screenMesh.material.emissiveIntensity = 2.4 + Math.sin(elapsedSeconds * 6) * 0.7;
+        if (projectorGlow) projectorGlow.intensity = 18 + Math.sin(elapsedSeconds * 6) * 5;
+      }
+      const foyer = systemEffects.get('gate');
+      if (foyer?.visible) {
+        foyer.rotation.y = Math.sin(elapsedSeconds * 1.5) * 0.025;
+        for (const light of foyer.children) light.intensity = 18 + Math.sin(elapsedSeconds * 4) * 5;
+      }
+    },
     setCompletedObjectives(completedObjectiveIds) {
       const completed = new Set(completedObjectiveIds);
       for (const [objectiveId, effect] of systemEffects) effect.visible = completed.has(objectiveId);

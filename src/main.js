@@ -28,6 +28,7 @@ const ui = {
   objectiveArrow: document.querySelector('#objective-arrow'),
   objectiveCopy: document.querySelector('#objective-copy'),
   guidanceCopy: document.querySelector('#guidance-copy'),
+  feedbackToast: document.querySelector('#feedback-toast'),
   endSignal: document.querySelector('#end-signal'),
   endTitle: document.querySelector('#end-title'),
   endCopy: document.querySelector('#end-copy'),
@@ -70,6 +71,7 @@ const movementButtons = { up: 'w', left: 'a', down: 's', right: 'd' };
 let frameId = 0;
 let missionWasFailed = false;
 let freeRoamAnnounced = false;
+let completedObjectiveCount = 0;
 let lastFrameTime = performance.now();
 
 function formatTime(seconds) {
@@ -178,12 +180,26 @@ function hideEndModal() {
   missionWasFailed = false;
 }
 
+function showCompletionFeedback(state) {
+  if (state.completedObjectiveIds.length <= completedObjectiveCount || !ui.feedbackToast) return;
+  const objectiveId = state.completedObjectiveIds.at(-1);
+  const objective = venueLayout.objectives.find(({ id }) => id === objectiveId);
+  const robot = robotController.robots[objective?.robotId];
+  const chain = state.message.includes('chain surge');
+  ui.feedbackToast.textContent = chain ? 'CHAIN SURGE!  +40 ENERGY' : `${robot?.name?.toUpperCase() ?? 'ROBOT'} ONLINE!  +20 ENERGY`;
+  ui.feedbackToast.classList.remove('show');
+  void ui.feedbackToast.offsetWidth;
+  ui.feedbackToast.classList.add('show');
+  completedObjectiveCount = state.completedObjectiveIds.length;
+}
+
 function renderMission(state) {
   ui.timer.textContent = formatTime(state.secondsLeft);
   ui.timer.style.color = state.secondsLeft <= 15 && !state.freeRoam ? 'var(--danger)' : 'var(--amber)';
   ui.status.textContent = state.failed ? 'Shift failed' : state.freeRoam ? 'Free exploration' : state.active ? 'Mission active' : 'Systems asleep';
   ui.missionMessage.textContent = state.message;
   if (ui.guidanceCopy) ui.guidanceCopy.textContent = objectiveGuidance(state);
+  showCompletionFeedback(state);
   ui.objectiveCount.textContent = `${state.completedObjectiveIds.length} / ${venueLayout.objectives.length} · ${state.sequenceScore} ENERGY`;
   document.querySelectorAll('[data-select]').forEach((card) => {
     const id = card.dataset.select;
@@ -238,6 +254,7 @@ function resetGame(showStart = true) {
   mission.restart();
   hideEndModal();
   freeRoamAnnounced = false;
+  completedObjectiveCount = 0;
   if (showStart) ui.startModal.classList.remove('hidden');
   else ui.startModal.classList.add('hidden');
   for (const marker of venue.objectiveMarkers.values()) marker.visible = true;
@@ -343,6 +360,7 @@ function animate(timestamp) {
     updateCoordinateReadout();
     updateObjectiveLocator(state);
   }
+  venue.updateEffects(timestamp / 1000);
   renderer.render(venue.scene, camera);
   frameId = window.requestAnimationFrame(animate);
 }
