@@ -48,6 +48,12 @@ function movementInputValue(keys) {
   };
 }
 
+export function screenRelativeMovementInput(input, cameraConfig) {
+  const cameraFacesPositiveZ = cameraConfig.target.z > cameraConfig.position.z;
+  const direction = cameraFacesPositiveZ ? -1 : 1;
+  return { x: input.x * direction, z: input.z * direction };
+}
+
 export function cameraFollowConfiguration(robot, layout, { portrait = false } = {}) {
   const activeStair = (layout.stairs ?? []).find((stair) => (
     stairHeightAt(robot.x, robot.z, stair, robot.radius ?? 0) !== null
@@ -98,12 +104,16 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
     if (Math.hypot(targetX, targetZ) > 0.01) robot.mesh.rotation.y = Math.atan2(-targetX, -targetZ);
   }
   const keys = new Set();
+  const touchKeys = new Set();
+  let touchCameraConfig = null;
   let selectedRobotId = 'voxxy';
 
   function selectRobot(id) {
     if (!robots[id]) return false;
     selectedRobotId = id;
     keys.clear();
+    touchKeys.clear();
+    touchCameraConfig = null;
     return true;
   }
 
@@ -114,9 +124,32 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
     return movementInputValue(keys);
   }
 
+  function setTouchInput(key, pressed) {
+    const normalizedKey = key.toLowerCase();
+    if (pressed) {
+      if (touchKeys.size === 0) {
+        const robot = robots[selectedRobotId];
+        const portrait = canvas && canvas.clientHeight > canvas.clientWidth;
+        touchCameraConfig = cameraFollowConfiguration(robot, layout, { portrait });
+      }
+      touchKeys.add(normalizedKey);
+    } else {
+      touchKeys.delete(normalizedKey);
+      if (touchKeys.size === 0) touchCameraConfig = null;
+    }
+    return movementInputValue(touchKeys);
+  }
+
   function update(deltaSeconds) {
     const robot = robots[selectedRobotId];
-    const robotInput = movementInputValue(keys);
+    const portrait = canvas && canvas.clientHeight > canvas.clientWidth;
+    const inputCameraConfig = cameraFollowConfiguration(robot, layout, { portrait });
+    const keyboardInput = movementInputValue(keys);
+    const touchInput = screenRelativeMovementInput(movementInputValue(touchKeys), touchCameraConfig ?? inputCameraConfig);
+    const robotInput = {
+      x: keyboardInput.x + touchInput.x,
+      z: keyboardInput.z + touchInput.z
+    };
     const next = advanceRobotState(robot, robotInput, deltaSeconds, layout, colliders);
     Object.assign(robot, next);
     if (robot.mesh) {
@@ -124,7 +157,6 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
       if (Math.hypot(robot.vx, robot.vz) > 0.01) robot.mesh.rotation.y = Math.atan2(-robot.vx, -robot.vz);
     }
     if (camera && THREE) {
-      const portrait = canvas && canvas.clientHeight > canvas.clientWidth;
       const cameraConfig = cameraFollowConfiguration(robot, layout, { portrait });
       const target = new THREE.Vector3(cameraConfig.target.x, cameraConfig.target.y, cameraConfig.target.z);
       const desiredPosition = new THREE.Vector3(cameraConfig.position.x, cameraConfig.position.y, cameraConfig.position.z);
@@ -140,6 +172,7 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
     robots,
     selectRobot,
     setInput,
+    setTouchInput,
     update,
     get activeRobotId() { return selectedRobotId; }
   };

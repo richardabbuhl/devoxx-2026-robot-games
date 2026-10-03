@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { advanceRobotState, cameraFollowConfiguration, createRobotController, ROBOT_SPECS } from '../src/robot-controller.js';
+import { advanceRobotState, cameraFollowConfiguration, createRobotController, ROBOT_SPECS, screenRelativeMovementInput } from '../src/robot-controller.js';
 import { venueLayout } from '../src/venue-layout.js';
 
 test('robot specialists retain distinct speeds', () => {
@@ -79,6 +79,36 @@ test('portrait camera keeps Biggy visible from the approach side at the gate mar
   const robot = { ...gate.position, objectiveId: gate.id, radius: 0.275 };
   const camera = cameraFollowConfiguration(robot, venueLayout, { portrait: true });
   assert.ok(camera.position.z < robot.z);
+});
+
+test('touch directions follow the portrait camera after the stair approach view switches', () => {
+  const gate = venueLayout.objectives.find(({ id }) => id === 'gate');
+  const robot = { ...gate.position, objectiveId: gate.id, radius: 0.275 };
+  const camera = cameraFollowConfiguration(robot, venueLayout, { portrait: true });
+  assert.deepEqual(screenRelativeMovementInput({ x: 1, z: -1 }, camera), { x: -1, z: 1 });
+});
+
+test('held touch direction stays stable while crossing Biggy camera switch boundary', () => {
+  const gate = venueLayout.objectives.find(({ id }) => id === 'gate');
+  const spawnPoints = Object.fromEntries(Object.values(ROBOT_SPECS).map(({ id }) => [
+    id,
+    { ...venueLayout.objectives.find(({ robotId }) => robotId === id).position }
+  ]));
+  spawnPoints.biggy = { x: gate.position.x + 3.1, y: 0, z: gate.position.z };
+  const controller = createRobotController({
+    THREE: null,
+    camera: null,
+    canvas: { clientWidth: 390, clientHeight: 844, tabIndex: 0 },
+    layout: venueLayout,
+    colliders: [],
+    spawnPoints
+  });
+  controller.selectRobot('biggy');
+  controller.setTouchInput('d', true);
+  controller.robots.biggy.x = gate.position.x + 2.9;
+  const startX = controller.robots.biggy.x;
+  controller.update(0.08);
+  assert.ok(controller.robots.biggy.x > startX);
 });
 
 test('keyboard input moves the selected robot and selection switches specialists', () => {

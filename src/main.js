@@ -325,19 +325,19 @@ document.querySelectorAll('[data-move]').forEach((button) => {
   button.addEventListener('pointerdown', (event) => {
     event.preventDefault();
     button.setPointerCapture(event.pointerId);
-    robotController.setInput(key, true);
+    robotController.setTouchInput(key, true);
   });
   const release = (event) => {
     event.preventDefault();
-    robotController.setInput(key, false);
+    robotController.setTouchInput(key, false);
   };
   button.addEventListener('pointerup', release);
   button.addEventListener('pointercancel', (event) => release(event));
-  button.addEventListener('lostpointercapture', () => robotController.setInput(key, false));
+  button.addEventListener('lostpointercapture', () => robotController.setTouchInput(key, false));
   button.addEventListener('click', (event) => {
     if (event.detail !== 0) return;
-    robotController.setInput(key, true);
-    window.setTimeout(() => robotController.setInput(key, false), 260);
+    robotController.setTouchInput(key, true);
+    window.setTimeout(() => robotController.setTouchInput(key, false), 260);
   });
 });
 
