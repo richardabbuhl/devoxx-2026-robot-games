@@ -72,9 +72,13 @@ test('objectives apply their specialist interaction rules before completing', ()
 
 test('restart clears progress and restores all robot spawns', () => {
   const { robots, mission } = createFixture();
+  const mesh = { position: { set() {} }, rotation: { y: 0 } };
+  robots[0].mesh = mesh;
+  robots[0].spawn.rotationY = -Math.PI / 2;
   mission.start();
   mission.activate({ x: 1, y: 0, z: 0 });
   robots[0].x = 9;
+  mesh.rotation.y = Math.PI;
   mission.restart();
   assert.equal(mission.state.active, false);
   assert.equal(mission.state.failed, false);
@@ -83,5 +87,6 @@ test('restart clears progress and restores all robot spawns', () => {
   assert.deepEqual(mission.state.completedObjectiveIds, []);
   assert.equal(mission.state.sequenceScore, 0);
   assert.equal(robots[0].x, 1);
+  assert.equal(mesh.rotation.y, -Math.PI / 2);
   assert.equal(mission.state.selectedRobotId, 'voxxy');
 });

@@ -101,7 +101,14 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
     if (!robot.mesh || !objective) continue;
     const targetX = objective.position.x - robot.x;
     const targetZ = objective.position.z - robot.z;
-    if (Math.hypot(targetX, targetZ) > 0.01) robot.mesh.rotation.y = Math.atan2(-targetX, -targetZ);
+    if (Math.hypot(targetX, targetZ) > 0.01) {
+      robot.mesh.rotation.y = Math.atan2(-targetX, -targetZ);
+      robot.spawn.rotationY = robot.mesh.rotation.y;
+    }
+  }
+  if (robots.biggy.mesh && robots.voxxy.spawn.rotationY !== undefined) {
+    robots.biggy.mesh.rotation.y = robots.voxxy.spawn.rotationY;
+    robots.biggy.spawn.rotationY = robots.voxxy.spawn.rotationY;
   }
   const keys = new Set();
   const touchKeys = new Set();

@@ -135,7 +135,10 @@ export function createMission({ robots, objectives, durationSeconds }) {
       if (robot.spawn) Object.assign(robot, robot.spawn);
       robot.vx = 0;
       robot.vz = 0;
-      if (robot.mesh) robot.mesh.position.set(robot.x, robot.y + (robot.height ?? 0.8) / 2, robot.z);
+      if (robot.mesh) {
+        robot.mesh.position.set(robot.x, robot.y + (robot.height ?? 0.8) / 2, robot.z);
+        if (robot.spawn.rotationY !== undefined) robot.mesh.rotation.y = robot.spawn.rotationY;
+      }
     }
     state = {
       active: false,
