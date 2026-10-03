@@ -1,9 +1,9 @@
 import { floorHeightAt, resolveMovement, stairHeightAt } from './collision.js';
 
 export const ROBOT_SPECS = Object.freeze({
-  voxxy: Object.freeze({ id: 'voxxy', name: 'Voxxy', speed: 3, objectiveId: 'beacon', message: 'Scan the beacon in the Exhibition Hall.', color: '#70c8bd' }),
-  droid: Object.freeze({ id: 'droid', name: 'Droid', speed: 1.8, objectiveId: 'power', message: 'Follow the blue beam to Auditorium 03. Repair the projector to earn a 15-second encore.', color: '#82a9d5' }),
-  biggy: Object.freeze({ id: 'biggy', name: 'Biggy', speed: 1.24, objectiveId: 'gate', message: 'Follow the orange beam to the lower gate, then activate Biggy to charge it and unseal the grand stair.', color: '#e8784d' })
+  voxxy: Object.freeze({ id: 'voxxy', name: 'Voxxy', speed: 3, objectiveId: 'beacon', message: 'Take Voxxy to the beacon in the Exhibition Hall, then press Activate.', color: '#70c8bd' }),
+  droid: Object.freeze({ id: 'droid', name: 'Droid', speed: 1.8, objectiveId: 'power', message: 'Take Droid up the middle stairs to Auditorium 03. Fix the projector by pressing Activate 3 times.', color: '#82a9d5' }),
+  biggy: Object.freeze({ id: 'biggy', name: 'Biggy', speed: 1.24, objectiveId: 'gate', message: 'Take Biggy to the stair gate. Keep rolling, then press Activate.', color: '#e8784d' })
 });
 
 const ACCELERATION = 8;
@@ -59,7 +59,7 @@ export function cameraFollowConfiguration(robot, layout, { portrait = false } = 
       target: { x: robot.x, y: robot.y + 0.4, z: robot.z },
       position: portrait
         ? { x: robot.x + 5, y: robot.y + 9, z: robot.z + cameraZOffset }
-        : { x: robot.x + 7, y: robot.y + 12, z: robot.z + 10 }
+        : { x: robot.x + 7, y: robot.y + 12, z: robot.z + cameraZOffset }
     };
   }
   const isUpperLevel = robot.y >= 4.5;

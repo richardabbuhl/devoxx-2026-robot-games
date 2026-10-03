@@ -49,7 +49,7 @@ test('camera rises above the stairwell to preserve a clear descent view', () => 
   };
   const camera = cameraFollowConfiguration(robot, venueLayout);
   assert.ok(camera.position.y - robot.y >= 12);
-  assert.ok(camera.position.z > robot.z);
+  assert.ok(Math.abs(camera.position.z - robot.z) >= 6.5);
   assert.ok(camera.target.y > robot.y);
 });
 

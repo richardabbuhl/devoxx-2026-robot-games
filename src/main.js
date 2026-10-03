@@ -27,6 +27,7 @@ const ui = {
   objectiveLocator: document.querySelector('#objective-locator'),
   objectiveArrow: document.querySelector('#objective-arrow'),
   objectiveCopy: document.querySelector('#objective-copy'),
+  guidanceCopy: document.querySelector('#guidance-copy'),
   endSignal: document.querySelector('#end-signal'),
   endTitle: document.querySelector('#end-title'),
   endCopy: document.querySelector('#end-copy'),
@@ -101,6 +102,43 @@ function updateCoordinateReadout() {
   ui.coordinateReadout.dataset.z = robot.z.toFixed(2);
 }
 
+function levelForHeight(y) {
+  return Math.abs(y - venueLayout.levels.cinema.elevation) < 0.8 ? 'cinema' : 'ground';
+}
+
+function objectiveGuidance(state) {
+  if (state.freeRoam) return 'You did it! Explore both floors, or play again and try a new order.';
+  const robot = robotController.robots[robotController.activeRobotId];
+  if (!robot) return 'Pick a robot, then follow its arrow.';
+  const objective = venueLayout.objectives.find(({ id }) => id === robot.objectiveId);
+  if (!objective) return `Follow ${robot.name}'s arrow, then press Activate.`;
+  if (state.completedObjectiveIds.includes(objective.id)) {
+    const remainingRobot = Object.values(robotController.robots).find((candidate) => (
+      !state.completedObjectiveIds.includes(candidate.objectiveId)
+    ));
+    return remainingRobot
+      ? `${robot.name} is finished! Choose ${remainingRobot.name}, then follow the arrow.`
+      : 'All three robots are ready!';
+  }
+  const room = venueLayout.rooms.find(({ id }) => id === objective.roomId);
+  const roomName = room?.name?.toUpperCase() ?? objective.roomId.toUpperCase();
+  const robotLevel = levelForHeight(robot.y);
+  if (objective.level !== robotLevel) {
+    const goingUp = objective.level === 'cinema';
+    return goingUp
+      ? `${robot.name}: go to the middle stairs, go UP, then follow the arrow to ${roomName}.`
+      : `${robot.name}: go to the middle stairs, go DOWN, then follow the arrow to ${roomName}.`;
+  }
+  if (objective.id === 'power') {
+    const progress = state.interactionProgress[objective.id] ?? 0;
+    return `Droid: find ${roomName}, then press Activate 3 times (${progress}/3).`;
+  }
+  if (objective.id === 'gate') {
+    return 'Biggy: keep moving toward the gate, then press Activate while rolling.';
+  }
+  return `${robot.name}: go to ${roomName}, then press Activate when it says Ready.`;
+}
+
 function updateObjectiveLocator(state) {
   const robot = robotController.robots[robotController.activeRobotId];
   const objective = venueLayout.objectives.find(({ id }) => id === robot?.objectiveId);
@@ -145,6 +183,7 @@ function renderMission(state) {
   ui.timer.style.color = state.secondsLeft <= 15 && !state.freeRoam ? 'var(--danger)' : 'var(--amber)';
   ui.status.textContent = state.failed ? 'Shift failed' : state.freeRoam ? 'Free exploration' : state.active ? 'Mission active' : 'Systems asleep';
   ui.missionMessage.textContent = state.message;
+  if (ui.guidanceCopy) ui.guidanceCopy.textContent = objectiveGuidance(state);
   ui.objectiveCount.textContent = `${state.completedObjectiveIds.length} / ${venueLayout.objectives.length} · ${state.sequenceScore} ENERGY`;
   document.querySelectorAll('[data-select]').forEach((card) => {
     const id = card.dataset.select;
