@@ -62,6 +62,14 @@
             <button type="button" data-move="down" aria-label="Move backward" title="Move backward">↓</button>
             <button type="button" data-move="right" aria-label="Move right" title="Move right">→</button>
           </div>
+          <div class="mobile-actions" aria-label="Robot and objective controls">
+            <div class="mobile-robot-switcher" role="group" aria-label="Choose a robot">
+              <button class="active" type="button" data-select="voxxy">Voxxy</button>
+              <button type="button" data-select="droid">Droid</button>
+              <button type="button" data-select="biggy">Biggy</button>
+            </div>
+            <button class="touch-activate" id="touch-activate" type="button">◎ Activate</button>
+          </div>
         </div>
         <div class="map-footer">
           <span><i class="legend-dot legend-voxxy"></i> fast / scan</span>
@@ -124,7 +132,8 @@
         <span><b>CHAIN</b> Biggy → Voxxy → Droid builds the strongest opening sequence</span>
       </div>
       <button class="primary-button" id="start-button" type="button">Start the night shift <span>→</span></button>
-      <small>Move: WASD / arrows · Switch: 1 2 3 · Activate: E</small>
+      <small class="desktop-controls-copy">Move: WASD / arrows · Switch: 1 2 3 · Activate: E</small>
+      <small class="mobile-controls-copy">Use the on-screen controls to move, switch robots, and activate systems.</small>
     </section>
   </div>
 

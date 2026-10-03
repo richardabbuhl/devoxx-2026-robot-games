@@ -53,6 +53,19 @@ test('camera rises above the stairwell to preserve a clear descent view', () => 
   assert.ok(camera.target.y > robot.y);
 });
 
+test('portrait camera moves closer while preserving an elevated view', () => {
+  const robot = { x: 8, y: 4.5, z: 25, radius: 0.275 };
+  const landscape = cameraFollowConfiguration(robot, venueLayout);
+  const portrait = cameraFollowConfiguration(robot, venueLayout, { portrait: true });
+  const distanceFromRobot = ({ position }) => Math.hypot(
+    position.x - robot.x,
+    position.y - robot.y,
+    position.z - robot.z
+  );
+  assert.ok(distanceFromRobot(portrait) < distanceFromRobot(landscape));
+  assert.ok(portrait.position.y > portrait.target.y);
+});
+
 test('keyboard input moves the selected robot and selection switches specialists', () => {
   const spawnPoints = Object.fromEntries(Object.values(ROBOT_SPECS).map(({ id }) => [
     id,

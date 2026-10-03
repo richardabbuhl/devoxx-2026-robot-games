@@ -15,6 +15,7 @@ const ui = {
   exploreButton: document.querySelector('#explore-button'),
   againButton: document.querySelector('#again-button'),
   resetButton: document.querySelector('#reset-button'),
+  touchActivate: document.querySelector('#touch-activate'),
   timer: document.querySelector('#timer'),
   status: document.querySelector('#status-copy'),
   missionMessage: document.querySelector('#mission-message'),
@@ -132,7 +133,7 @@ function renderMission(state) {
   ui.status.textContent = state.failed ? 'Shift failed' : state.freeRoam ? 'Free exploration' : state.active ? 'Mission active' : 'Systems asleep';
   ui.missionMessage.textContent = state.message;
   ui.objectiveCount.textContent = `${state.completedObjectiveIds.length} / ${venueLayout.objectives.length} · ${state.sequenceScore} ENERGY`;
-  document.querySelectorAll('.crew-card').forEach((card) => {
+  document.querySelectorAll('[data-select]').forEach((card) => {
     const id = card.dataset.select;
     const robot = robotController.robots[id];
     const isComplete = state.completedObjectiveIds.includes(robot.objectiveId);
@@ -216,6 +217,10 @@ ui.againButton.addEventListener('click', () => {
   startGame();
 });
 ui.resetButton.addEventListener('click', () => resetGame(true));
+ui.touchActivate.addEventListener('pointerdown', (event) => {
+  event.preventDefault();
+  activateSelectedRobot();
+});
 mission.subscribe(renderMission);
 
 document.addEventListener('keydown', (event) => {
@@ -258,7 +263,8 @@ document.querySelectorAll('[data-move]').forEach((button) => {
   button.addEventListener('pointerup', release);
   button.addEventListener('pointercancel', (event) => release(event));
   button.addEventListener('lostpointercapture', () => robotController.setInput(key, false));
-  button.addEventListener('click', () => {
+  button.addEventListener('click', (event) => {
+    if (event.detail !== 0) return;
     robotController.setInput(key, true);
     window.setTimeout(() => robotController.setInput(key, false), 260);
   });

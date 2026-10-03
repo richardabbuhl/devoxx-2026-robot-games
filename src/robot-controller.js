@@ -48,19 +48,24 @@ function movementInputValue(keys) {
   };
 }
 
-export function cameraFollowConfiguration(robot, layout) {
+export function cameraFollowConfiguration(robot, layout, { portrait = false } = {}) {
   const isOnStair = (layout.stairs ?? []).some((stair) => (
     stairHeightAt(robot.x, robot.z, stair, robot.radius ?? 0) !== null
   ));
   if (isOnStair) {
     return {
       target: { x: robot.x, y: robot.y + 0.4, z: robot.z },
-      position: { x: robot.x + 7, y: robot.y + 12, z: robot.z + 10 }
+      position: portrait
+        ? { x: robot.x + 5, y: robot.y + 9, z: robot.z + 7 }
+        : { x: robot.x + 7, y: robot.y + 12, z: robot.z + 10 }
     };
   }
+  const isUpperLevel = robot.y >= 4.5;
   return {
     target: { x: robot.x, y: robot.y + 0.55, z: robot.z },
-    position: { x: robot.x + 5.6, y: robot.y + (robot.y < 4.5 ? 3.2 : 6), z: robot.z + 8.5 }
+    position: portrait
+      ? { x: robot.x + 3.7, y: robot.y + (isUpperLevel ? 4.2 : 2.8), z: robot.z + 5.6 }
+      : { x: robot.x + 5.6, y: robot.y + (isUpperLevel ? 6 : 3.2), z: robot.z + 8.5 }
   };
 }
 
@@ -114,7 +119,8 @@ export function createRobotController({ THREE, camera, canvas, layout, colliders
       if (Math.hypot(robot.vx, robot.vz) > 0.01) robot.mesh.rotation.y = Math.atan2(-robot.vx, -robot.vz);
     }
     if (camera && THREE) {
-      const cameraConfig = cameraFollowConfiguration(robot, layout);
+      const portrait = canvas && canvas.clientHeight > canvas.clientWidth;
+      const cameraConfig = cameraFollowConfiguration(robot, layout, { portrait });
       const target = new THREE.Vector3(cameraConfig.target.x, cameraConfig.target.y, cameraConfig.target.z);
       const desiredPosition = new THREE.Vector3(cameraConfig.position.x, cameraConfig.position.y, cameraConfig.position.z);
       camera.position.lerp(desiredPosition, 1 - Math.exp(-4 * Math.min(deltaSeconds, 0.1)));
