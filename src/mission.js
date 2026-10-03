@@ -82,7 +82,7 @@ export function createMission({ robots, objectives, durationSeconds }) {
     }
     const minimumSpeed = objective.minimumSpeed ?? 0;
     if (speed < minimumSpeed) {
-      state.message = `${robot.name} must keep moving and press E at ${objective.id}.`;
+      state.message = `${robot.name} needs more momentum. Keep moving while activating ${objective.id}.`;
       publish();
       return false;
     }

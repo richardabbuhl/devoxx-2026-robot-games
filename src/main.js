@@ -192,11 +192,13 @@ function resetGame(showStart = true) {
   renderMission(mission.state);
 }
 
-function activateSelectedRobot() {
+function activateSelectedRobot({ touch = false } = {}) {
   const robot = robotController.robots[robotController.activeRobotId];
-  mission.activate(
+  const objective = venueLayout.objectives.find(({ id }) => id === robot.objectiveId);
+  const currentSpeed = Math.hypot(robot.vx, robot.vz);
+  return mission.activate(
     { x: robot.x, y: robot.y, z: robot.z },
-    { speed: Math.hypot(robot.vx, robot.vz) }
+    { speed: touch ? Math.max(currentSpeed, objective?.minimumSpeed ?? 0) : currentSpeed }
   );
 }
 
@@ -219,7 +221,7 @@ ui.againButton.addEventListener('click', () => {
 ui.resetButton.addEventListener('click', () => resetGame(true));
 ui.touchActivate.addEventListener('pointerdown', (event) => {
   event.preventDefault();
-  activateSelectedRobot();
+  activateSelectedRobot({ touch: true });
 });
 mission.subscribe(renderMission);
 
