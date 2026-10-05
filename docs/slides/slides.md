@@ -13,6 +13,11 @@
 - Coder: Richard with GitHub Copilot and VS Code
 - Testers: Zahra, Nina, colleagues, GitHub Copilot, and Google Gemini
 
+### The deadline
+
+- It was definitely a case of woulda, coulda, shoulda: I started late with the submissiojn
+- Using my personal GitHub account, with a limited AI token budget and no Claude Code subscription, I built something working and submitted it just in time
+
 ### What we learned
 
 - Every improvement could introduce a new bug, so each change needed testing and repair
