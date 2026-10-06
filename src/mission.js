@@ -35,7 +35,7 @@ export function createMission({ robots, objectives, durationSeconds }) {
     completionOrder: [],
     sequenceScore: 0,
     interactionProgress: {},
-    message: 'Choose any specialist. Link their systems to build the opening sequence.'
+    message: 'Choose any specialist. Biggy -> Voxxy -> Droid creates the strongest relay.'
   };
 
   function publish() {
@@ -150,7 +150,7 @@ export function createMission({ robots, objectives, durationSeconds }) {
       completionOrder: [],
       sequenceScore: 0,
       interactionProgress: {},
-      message: 'Choose any specialist. Link their systems to build the opening sequence.'
+      message: 'Choose any specialist. Biggy -> Voxxy -> Droid creates the strongest relay.'
     };
     publish();
     return snapshot(state);
