@@ -533,6 +533,51 @@ export function createVenueScene(THREE, layout) {
   scene.add(routeGuidance);
   systemEffects.set('beacon', routeGuidance);
 
+  const approachMaterial = new THREE.MeshStandardMaterial({
+    color: 0x63d889,
+    emissive: 0x63d889,
+    emissiveIntensity: 2.6,
+    roughness: 0.3
+  });
+  const createBreadcrumbPath = (id, points) => {
+    const path = new THREE.Group();
+    path.name = `${id}-approach-path`;
+    points.forEach((point, index) => {
+      const nextPoint = points[index + 1] ?? point;
+      const arrow = new THREE.Group();
+      arrow.position.set(point.x, point.y, point.z);
+      arrow.rotation.y = Math.atan2(nextPoint.x - point.x, nextPoint.z - point.z) - Math.PI / 2;
+      for (const side of [-1, 1]) {
+        const chevron = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.045, 0.08), approachMaterial);
+        chevron.position.set(-0.12, 0, side * 0.11);
+        chevron.rotation.y = side * 0.58;
+        arrow.add(chevron);
+      }
+      path.add(arrow);
+    });
+    scene.add(path);
+    return path;
+  };
+  const navigationPaths = new Map([
+    ['voxxy', createBreadcrumbPath('beacon', [
+      { x: 9.5, y: 0.11, z: 25 }, { x: 11.5, y: 0.11, z: 25 }, { x: 13.5, y: 0.11, z: 25 },
+      { x: 15.5, y: 0.11, z: 25 }, { x: 17.5, y: 0.11, z: 25 }
+    ])],
+    ['droid', createBreadcrumbPath('power', [
+      { x: 23, y: 4.61, z: 17 }, { x: 23, y: 4.61, z: 19 }, { x: 25, y: 4.61, z: 22 },
+      { x: 25, y: 4.61, z: 26 }, { x: 25, y: 4.61, z: 30 }, { x: 25, y: 4.61, z: 33.5 }
+    ])],
+    ['biggy', createBreadcrumbPath('gate', [
+      { x: 28, y: 0.11, z: 25 }, { x: 30, y: 0.11, z: 22.8 }, { x: 32, y: 0.11, z: 20.8 },
+      { x: 34, y: 0.11, z: 20.5 }, { x: 35, y: 0.11, z: 20.5 }
+    ])]
+  ]);
+  for (const [robotId, path] of navigationPaths) {
+    path.visible = robotId === 'voxxy';
+  }
+  let completedObjectiveIds = new Set();
+  let selectedRobotId = 'voxxy';
+
   const cinemaScreen = new THREE.Group();
   cinemaScreen.name = 'power-auditorium-screen';
   cinemaScreen.visible = false;
@@ -588,6 +633,7 @@ export function createVenueScene(THREE, layout) {
         route.rotation.y = elapsedSeconds * 0.35;
         route.scale.setScalar(pulse);
       }
+      approachMaterial.emissiveIntensity = 2.35 + Math.sin(elapsedSeconds * 2.2) * 0.25;
       const screenGroup = systemEffects.get('power');
       if (screenGroup?.visible) {
         const screenMesh = screenGroup.getObjectByName('power-screen');
@@ -601,14 +647,27 @@ export function createVenueScene(THREE, layout) {
         for (const light of foyer.children) light.intensity = 18 + Math.sin(elapsedSeconds * 4) * 5;
       }
     },
-    setCompletedObjectives(completedObjectiveIds) {
-      const completed = new Set(completedObjectiveIds);
+    setCompletedObjectives(completedIds) {
+      const completed = new Set(completedIds);
+      completedObjectiveIds = completed;
       for (const [objectiveId, effect] of systemEffects) effect.visible = completed.has(objectiveId);
+      const objectiveByRobot = { voxxy: 'beacon', droid: 'power', biggy: 'gate' };
+      for (const [robotId, path] of navigationPaths) {
+        path.visible = robotId === selectedRobotId && !completed.has(objectiveByRobot[robotId]);
+      }
       const gateUnlocked = completed.has('gate');
       grandStairGate.visible = !gateUnlocked;
       const gateColliderIndex = colliders.indexOf(grandStairGateCollider);
       if (gateUnlocked && gateColliderIndex >= 0) colliders.splice(gateColliderIndex, 1);
       if (!gateUnlocked && gateColliderIndex < 0) colliders.push(grandStairGateCollider);
+    },
+    setSelectedRobot(robotId) {
+      selectedRobotId = robotId;
+      const objectiveByRobot = { voxxy: 'beacon', droid: 'power', biggy: 'gate' };
+      for (const [pathRobotId, path] of navigationPaths) {
+        path.visible = pathRobotId === selectedRobotId
+          && !completedObjectiveIds.has(objectiveByRobot[pathRobotId]);
+      }
     },
     bounds: { ...layout.bounds },
     stairs,

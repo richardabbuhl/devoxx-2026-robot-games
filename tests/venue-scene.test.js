@@ -17,6 +17,16 @@ test('venue scene is assembled from both levels and shared layout colliders', ()
   assert.ok(result.scene.getObjectByName('grand-stair-treads'));
   assert.ok(result.scene.getObjectByName('aud-03-carpet'));
   assert.ok(result.scene.getObjectByName('power-navigation-beam'));
+  for (const pathId of ['beacon', 'power', 'gate']) {
+    assert.ok(result.scene.getObjectByName(`${pathId}-approach-path`));
+  }
+  assert.equal(result.scene.getObjectByName('beacon-approach-path').visible, true);
+  assert.equal(result.scene.getObjectByName('power-approach-path').visible, false);
+  const navigationChevron = result.scene.getObjectByName('beacon-approach-path').children[0].children[0];
+  assert.equal(navigationChevron.material.color.getHex(), 0x63d889);
+  result.setSelectedRobot('droid');
+  assert.equal(result.scene.getObjectByName('beacon-approach-path').visible, false);
+  assert.equal(result.scene.getObjectByName('power-approach-path').visible, true);
   const voxxyShield = result.scene.getObjectByName('voxxy-face-screen');
   assert.equal(voxxyShield.material.color.getHex(), 0x030506);
   assert.ok(voxxyShield.position.z < -0.25);
@@ -27,6 +37,10 @@ test('venue scene is assembled from both levels and shared layout colliders', ()
   assert.ok(result.colliders.some(({ id }) => id === 'grand-stair-route-lock'));
   assert.equal(result.systemEffects.size, venueLayout.objectives.length);
   result.setCompletedObjectives(['beacon', 'power']);
+  assert.equal(result.scene.getObjectByName('beacon-approach-path').visible, false);
+  assert.equal(result.scene.getObjectByName('power-approach-path').visible, false);
+  result.setSelectedRobot('voxxy');
+  assert.equal(result.scene.getObjectByName('beacon-approach-path').visible, false);
   assert.equal(result.systemEffects.get('beacon').visible, true);
   assert.equal(result.systemEffects.get('power').visible, true);
   assert.equal(result.systemEffects.get('gate').visible, false);

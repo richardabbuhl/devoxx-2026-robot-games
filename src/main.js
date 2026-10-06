@@ -218,6 +218,7 @@ function renderMission(state) {
     }
   }
   venue.setCompletedObjectives(state.completedObjectiveIds);
+  venue.setSelectedRobot(state.selectedRobotId);
   if (robotController.activeRobotId !== state.selectedRobotId) robotController.selectRobot(state.selectedRobotId);
   updateCoordinateReadout();
   updateObjectiveLocator(state);
