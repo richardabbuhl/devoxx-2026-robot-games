@@ -11,7 +11,7 @@
 
 - BA: copilot downloaded and translated the Devoxx brief into missions and goals
 - Coder: Richard with GitHub Copilot and VS Code
-- Testers: Zahra, Nina, colleagues, GitHub Copilot, and Google Gemini
+- Testers: Zahra, Nina, colleagues, GitHub Copilot, Google Gemini, and random people
 
 ### The deadline
 
