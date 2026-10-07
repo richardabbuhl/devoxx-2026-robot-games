@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devoxx 2026 Robot Games</title>
+  <style>
+    @page { size: 16in 9in; margin: 0; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body { background: #111923; color: #f7f0e4; font-family: Avenir Next, Futura, Trebuchet MS, sans-serif; }
+    .slide { position: relative; display: grid; grid-template-columns: 59% 41%; width: 1600px; height: 900px; overflow: hidden; background: #111923; }
+    .content { position: relative; z-index: 1; padding: 68px 70px 50px; }
+    .eyebrow { margin: 0 0 18px; color: #55d4b3; font: 700 18px SFMono-Regular, Consolas, monospace; letter-spacing: 2px; text-transform: uppercase; }
+    h1 { max-width: 790px; margin: 0; color: #f7f0e4; font-size: 75px; line-height: .96; letter-spacing: 0; }
+    h1 span { color: #ff7959; }
+    .subtitle { max-width: 680px; margin: 28px 0 42px; color: #c8d4d0; font-size: 26px; line-height: 1.3; }
+    .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 780px; }
+    .role { min-height: 145px; padding: 18px; border-top: 5px solid var(--accent); background: #202d34; }
+    .role strong { display: block; color: var(--accent); font: 700 15px SFMono-Regular, Consolas, monospace; letter-spacing: 1px; }
+    .role span { display: block; margin-top: 13px; color: #f7f0e4; font-size: 19px; line-height: 1.17; }
+    .lesson { max-width: 785px; margin-top: 48px; padding: 19px 22px; border-left: 5px solid #f2b34d; background: #19242b; color: #d9e0dc; font-size: 21px; line-height: 1.35; }
+    .lesson b { color: #f2b34d; }
+    .photo { position: relative; overflow: hidden; background: #e45d42; }
+    .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 54% center; }
+    .photo::after { position: absolute; inset: 0; background: rgba(16, 22, 32, .18); content: ''; }
+    .photo-label { position: absolute; z-index: 2; right: 28px; bottom: 28px; left: 28px; padding: 18px; border: 1px solid rgba(247, 240, 228, .5); background: rgba(17, 25, 35, .86); color: #f7f0e4; font: 700 16px SFMono-Regular, Consolas, monospace; letter-spacing: 1px; line-height: 1.35; text-transform: uppercase; }
+    .photo-label span { display: block; margin-top: 5px; color: #55d4b3; font-size: 13px; }
+    .stamp { position: absolute; right: 46%; bottom: 35px; color: #899894; font: 700 13px SFMono-Regular, Consolas, monospace; letter-spacing: 1.4px; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <main class="slide">
+    <section class="content">
+      <p class="eyebrow">Devoxx Belgium 2026 / Robot Games</p>
+      <h1>After Hours:<br><span>Cinema Circuit</span></h1>
+      <p class="subtitle">A playable robot mission through Kinepolis Antwerp, built around three specialists, real player feedback, and a very late deadline.</p>
+
+      <section class="roles" aria-label="Team roles">
+        <div class="role" style="--accent:#55d4b3"><strong>BA</strong><span>Turned the Devoxx brief into missions and goals.</span></div>
+        <div class="role" style="--accent:#719fff"><strong>CODER</strong><span>Richard, GitHub Copilot, and VS Code.</span></div>
+        <div class="role" style="--accent:#ff7959"><strong>TESTERS</strong><span>Zahra, Nina, colleagues, and brave volunteers.</span></div>
+      </section>
+
+      <p class="lesson"><b>The lesson:</b> every improvement can create a new bug. Test the change, repair the route, then spend the remaining time on the polish players actually notice.</p>
+      <p class="stamp">Kinepolis Antwerp / Build. Test. Iterate.</p>
+    </section>
+
+    <aside class="photo">
+      <img src="testers.jpg" alt="Players testing an arcade game">
+      <div class="photo-label">Playtesting is the game engine<span>Feedback turned into routes, guidance, and a better mission.</span></div>
+    </aside>
+  </main>
+</body>
+</html>
