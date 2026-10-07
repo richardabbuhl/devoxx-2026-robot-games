@@ -1,25 +1,26 @@
-# Devoxx 2026 Robot Games
+# After Hours: Cinema Circuit
 
-## A playable robot mission through Kinepolis Antwerp
+## 0:00-3:00 - Live demo
 
-- Three robots, three capabilities: Voxxy, Droid, and Biggy
-- Explore auditoriums, corridors, exhibition spaces, and connecting stairs
-- Choose routes as building conditions change
-- Designed for first-time players, kids, desktop, and mobile
+- A playable robot mission through Kinepolis Antwerp.
+- Start a shift and immediately show the goal: wake the venue's three systems.
+- Switch between Voxxy, Droid, and Biggy to show that each specialist changes the route.
+- Finish one objective, then show how the next route opens or lights up.
 
-### The team
+## 3:00-4:00 - How I built it
 
-- BA: copilot downloaded and translated the Devoxx brief into missions and goals
-- Coder: Richard with GitHub Copilot and VS Code
-- Testers: Zahra, Nina, colleagues, GitHub Copilot, Google Gemini, and random people
+- I translated the Devoxx brief into missions and goals, then built the game in JavaScript, Three.js, and VS Code with GitHub Copilot.
+- AI helped with procedural geometry, collision logic, and tests; I reviewed and adjusted the plan-derived layout and dimensions by hand.
+- The proud part is that the real cinema-inspired space, robot abilities, and objectives became one playable route rather than three disconnected features.
 
-### The deadline
+## If there is time - The lesson
 
-- It was definitely a case of woulda, coulda, shoulda: I started late with the submissiojn
-- Using my personal GitHub account, with a limited AI token budget and no Claude Code subscription, I built something working and submitted it just in time
+- Every improvement can create a new bug. Playtesting showed where routes, collision edges, and guidance needed repair.
+- The useful limit was not more polish: it was choosing the changes that players actually notice.
+- Neither I nor GitHub Copilot can create a good game without human feedback.
 
-### What we learned
+## Thank you
 
-- Every improvement could introduce a new bug, so each change needed testing and repair
-- As improvements delivered less value, we focused on the highest-impact polish instead of optimizing forever
-- Like tuning a race car, optimization could continue indefinitely; eventually, the limiting factor was not the tools, but the human ability to imagine meaningful improvements
+- Zahra and Nina
+- My colleagues
+- The brave volunteers who tested it
