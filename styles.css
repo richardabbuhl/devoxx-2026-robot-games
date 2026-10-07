@@ -1,6 +1,6 @@
-:root { --ink: #e9e6dc; --muted: #9ca09b; --bg: #151b1e; --panel: #1d2528; --line: rgba(234,230,220,.14); --amber: #edaa54; --orange: #e8784d; --cyan: #70c8bd; --blue: #82a9d5; --danger: #ec725e; }
+:root { --ink: #f5eee3; --muted: #a4aaa3; --bg: #161b21; --panel: #202b2d; --line: rgba(245,238,227,.14); --amber: #f2b24e; --orange: #ff7657; --cyan: #45d2b1; --blue: #6e9fff; --danger: #ef5e68; }
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; background: #111719; color: var(--ink); font-family: 'Avenir Next', 'Trebuchet MS', sans-serif; }
+body { margin: 0; min-width: 320px; background: #12171c; color: var(--ink); font-family: 'Avenir Next', 'Trebuchet MS', sans-serif; }
 button { font: inherit; color: inherit; }
 .app-shell { width: min(1440px, calc(100% - 48px)); margin: 0 auto; padding: 28px 0 36px; }
 .topbar, .briefing-bar, .panel-heading, .map-footer, .log-heading, .mission-status, .brand-lockup { display: flex; align-items: center; justify-content: space-between; }
@@ -29,7 +29,7 @@ h1 span { color: var(--muted); font-weight: 400; }
 h3 { margin: 4px 0 0; font-size: 16px; font-weight: 500; letter-spacing: -.02em; }
 .guidance-copy { margin: 12px 0 0; color: #d2c8ab; font: 500 10px 'DM Mono', monospace; line-height: 1.45; letter-spacing: .04em; text-transform: uppercase; }
 .coordinate-readout { padding-top: 4px; color: var(--amber); font-size: 9px; }
-#game-view { position: relative; width: 100%; overflow: hidden; border: 1px solid rgba(16,25,25,.36); background: #101719; outline: none; }
+#game-view { position: relative; width: 100%; overflow: hidden; border: 1px solid rgba(16,25,25,.36); background: #141a20; outline: none; }
 .feedback-toast { position: absolute; z-index: 5; top: 50%; left: 50%; min-width: min(300px, calc(100% - 32px)); padding: 14px 18px; border: 1px solid var(--amber); background: rgba(13, 20, 21, .92); color: var(--amber); text-align: center; font: 600 13px 'DM Mono', monospace; letter-spacing: .08em; opacity: 0; pointer-events: none; transform: translate(-50%, -42%) scale(.92); }
 .feedback-toast.show { animation: feedback-pop 1.35s ease-out both; }
 @keyframes feedback-pop { 0% { opacity: 0; transform: translate(-50%, -42%) scale(.92); } 14%, 72% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -62%) scale(1.04); } }

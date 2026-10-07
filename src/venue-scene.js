@@ -1,22 +1,22 @@
 const COLORS = Object.freeze({
-  background: 0x101719,
-  publicFloor: 0x827b6c,
-  cinemaFloor: 0x343536,
-  wall: 0xc5c1b7,
-  auditoriumWall: 0x252a2b,
-  ceiling: 0x8a867d,
-  carpet: 0x292526,
-  seat: 0x7a2933,
-  stair: 0xb5aa96,
-  rail: 0x343b3b,
-  amber: 0xe1a65a,
-  cyan: 0x6bd0c3,
-  blue: 0x80a8d8,
-  orange: 0xe9784f,
+  background: 0x141a20,
+  publicFloor: 0x847d70,
+  cinemaFloor: 0x29363a,
+  wall: 0xd1c7b6,
+  auditoriumWall: 0x292536,
+  ceiling: 0x9a8f81,
+  carpet: 0x302738,
+  seat: 0xaa4059,
+  stair: 0xc1b49f,
+  rail: 0x38454a,
+  amber: 0xf2b24e,
+  cyan: 0x45d2b1,
+  blue: 0x6e9fff,
+  orange: 0xff7657,
   voxxyOrange: 0xf07822,
   droidMetal: 0x2b3035,
-  biggyBlue: 0x35434d,
-  biggyRust: 0xaf4e2e,
+  biggyBlue: 0x34556c,
+  biggyRust: 0xc85b3c,
   face: 0x111518,
   ivory: 0xd7d3c8
 });
@@ -370,17 +370,21 @@ export function createVenueScene(THREE, layout) {
     frame: material(THREE, COLORS.amber, { metalness: 0.48, roughness: 0.36 })
   };
 
-  const ambient = new THREE.HemisphereLight(0xd8e1db, 0x3e3632, 2.2);
+  const ambient = new THREE.HemisphereLight(0xbdd8d1, 0x332d45, 2.2);
   ambient.name = 'venue-ambient';
   scene.add(ambient);
-  const keyLight = new THREE.DirectionalLight(0xffd6a0, 2.4);
+  const keyLight = new THREE.DirectionalLight(0xffc46b, 2.4);
   keyLight.name = 'foyer-key-light';
   keyLight.position.set(35, 28, 22);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
   scene.add(keyLight);
-  for (const position of [{ x: 35, y: 7.5, z: 27 }, { x: 18, y: 4, z: 16 }, { x: 48, y: 4, z: 16 }]) {
-    const light = new THREE.PointLight(0xeacb98, 16, 18, 2);
+  for (const { color, ...position } of [
+    { x: 35, y: 7.5, z: 27, color: COLORS.amber },
+    { x: 18, y: 4, z: 16, color: COLORS.cyan },
+    { x: 48, y: 4, z: 16, color: COLORS.blue }
+  ]) {
+    const light = new THREE.PointLight(color, 16, 18, 2);
     light.position.set(position.x, position.y, position.z);
     scene.add(light);
   }
